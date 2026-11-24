@@ -1,0 +1,11 @@
+name = "inabox-games-forager-test"
+main = "worker.js"
+compatibility_date = "2026-11-24"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+[vars]
+APPS_SCRIPT_EXEC_URL = "https://script.google.com/macros/s/AKfycbysXIUlPVSOhdPomCTjJe8fcY9Dyd5HzV-ox9OEJj8jwHYxDOY_pQCsX_KQuWBzbrXT/exec"
