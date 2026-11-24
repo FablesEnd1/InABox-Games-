@@ -1,0 +1,2714 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      --bg: #090909;
+      --surface: #15120d;
+      --surface-hover: #211a0f;
+      --border: rgba(183, 119, 25, 0.58);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #f5a623;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 50% -35%, rgba(142, 86, 12, .13), transparent 55%),
+        #090909;
+      position: relative;
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .topbar {
+      position: relative; /* Settings button scrolls away with the page */
+      top: auto;
+      z-index: 10;
+      background: rgba(8, 13, 25, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-inner {
+      max-width: 1440px;
+      min-height: 18px;
+      margin: auto;
+      padding: 11px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    /* Box logo */
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      background: transparent;
+    }
+
+    .brand-icon svg {
+      width: 42px;
+      height: 42px;
+      display: block;
+    }
+
+    .brand-name {
+      font-size: 20px;
+      font-weight: 850;
+      letter-spacing: -0.7px;
+      white-space: nowrap;
+    }
+
+    .brand-name span {
+      color: var(--accent);
+    }
+
+    main {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 65px 5.2% 55px;
+    }
+
+    /* Centered brand banner */
+    body.hide-home-title .hero { display:none !important; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      margin-bottom: 28px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 20px;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(37, 99, 235, 0.3), transparent 58%),
+        linear-gradient(110deg, #101c35, #102957, #10182a);
+      isolation: isolate;
+    }
+
+    .hero-decoration {
+      position: absolute; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        linear-gradient(135deg, transparent 68%, rgba(37,99,235,.12) 68% 72%, transparent 72%),
+        linear-gradient(135deg, transparent 77%, rgba(59,130,246,.15) 77% 81%, transparent 81%),
+        radial-gradient(circle at 50% 45%, rgba(59,130,246,.2), transparent 30%);
+    }
+    .hero-copy { min-width: 0; text-align: center; }
+    .hero-title { margin: 0; display: flex; align-items: center; justify-content: center; gap: 13px; font-size: clamp(32px, 4.2vw, 52px); line-height: 1.08; font-weight: 900; letter-spacing: -1.4px; text-shadow: 0 4px 22px rgba(0,0,0,.28); }
+    .hero-title span { color: var(--accent); }
+    .hero-logo { width: clamp(38px, 4vw, 52px); height: clamp(38px, 4vw, 52px); flex: 0 0 auto; display: block; image-rendering: auto; }
+
+    .random-game-card { cursor: pointer; text-align: left; border: 1px solid var(--border); padding: 0; font: inherit; }
+    .random-game-card .cover { position: relative; }
+    .random-game-card .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .random-game-card .random-tag { position: absolute; top: 9px; left: 9px; z-index: 1; padding: 5px 8px; border-radius: 7px; background: rgba(37,99,235,.94); color: #fff; font-size: 10px; font-weight: 850; letter-spacing: .3px; }
+    .random-game-card .title { color: #f1f5f9; }
+    .random-game-card:hover .play-label { color: #93c5fd; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 20px;
+      pointer-events: none;
+    }
+
+    #search {
+      width: 100%;
+      height: 50px;
+      padding: 0 16px 0 46px;
+      color: white;
+      background: rgba(17, 26, 43, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    #search::placeholder {
+      color: #718096;
+    }
+
+    #search:focus {
+      border-color: rgba(96, 165, 250, 0.7);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .count-pill {
+      flex-shrink: 0;
+      padding: 11px 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .alphabet {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 30px;
+    }
+
+    .letter-btn {
+      min-width: 35px;
+      height: 35px;
+      padding: 0 9px;
+      color: #a6b4c9;
+      background: #111a2b;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 750;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+
+    .letter-btn:hover,
+    .letter-btn.active {
+      color: white;
+      background: #2563eb;
+      border-color: #3b82f6;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: -0.5px;
+    }
+
+    #result-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    #games {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      min-width: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      color: inherit;
+      text-decoration: none;
+      background: linear-gradient(180deg, #121d30, #0f1727);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(96, 165, 250, 0.55);
+      background: var(--surface-hover);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .cover {
+      position: relative;
+      height: 160px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      background: #0b1220;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+    }
+
+    .cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      transition: transform .25s ease;
+    }
+
+    .card:hover .cover img {
+      transform: scale(1.035);
+    }
+
+    .fallback {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      font-size: 48px;
+      font-weight: 900;
+      color: #bfdbfe;
+      background:
+        radial-gradient(circle at 30% 20%,
+          rgba(96, 165, 250, .22), transparent 55%),
+        linear-gradient(135deg, #1b2d49, #111827);
+    }
+
+    .card-info {
+      min-height: 66px;
+      padding: 14px 13px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .title {
+      margin: 0;
+      color: #f1f5f9;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .play-label {
+      color: #7e94b3;
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: .3px;
+      transition: color .2s;
+    }
+
+    .card:hover .play-label {
+      color: #93c5fd;
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      padding: 55px 20px;
+      text-align: center;
+      border: 1px dashed rgba(148, 163, 184, .25);
+      border-radius: 18px;
+      color: var(--muted);
+      background: rgba(17, 26, 43, .55);
+    }
+
+    .empty strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #e2e8f0;
+      font-size: 18px;
+    }
+
+    footer {
+      padding: 28px 10px 0;
+      color: #718096;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .artwork-tools {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      bottom: 6px;
+      z-index: 4;
+      display: none;
+      gap: 5px;
+    }
+    .artwork-tool-button {
+      flex: 1;
+      min-width: 0;
+      padding: 7px 5px;
+      color: #fff;
+      background: rgba(37, 99, 235, .96);
+      border: 1px solid rgba(191, 219, 254, .7);
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .artwork-tool-button.search-new { background: rgba(5, 150, 105, .97); }
+    body.secret-artwork-mode .artwork-tools { display: flex; }
+    .artwork-tool-button:disabled { opacity: .65; cursor: wait; }
+
+    .artwork-tool-button.upload-artwork { background: rgba(180, 83, 9, .97); }
+    .artwork-tools { flex-wrap: wrap; }
+    .artwork-picker-backdrop { position: fixed; inset: 0; z-index: 1000; display: none; place-items: center; padding: 18px; background: rgba(0,0,0,.78); }
+    .artwork-picker-backdrop.open { display: grid; }
+    .artwork-picker { width: min(440px, 100%); padding: 22px; border: 1px solid #bd7b17; border-radius: 14px; color: #f8fafc; background: #15120d; box-shadow: 0 18px 60px rgba(0,0,0,.55); }
+    .artwork-picker h3 { margin: 0 0 8px; color: #ffb22c; }
+    .artwork-picker p { margin: 0 0 14px; color: #b6a78f; font-size: 13px; }
+    .artwork-picker input[type=url] { width: 100%; padding: 12px; color: white; background: #090909; border: 1px solid rgba(183,119,25,.7); border-radius: 8px; }
+    .artwork-picker input[type=file] { width: 100%; margin: 12px 0; color: #ddd; }
+    .artwork-picker-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+    .artwork-picker-actions button { padding: 9px 13px; border-radius: 8px; border: 1px solid #bd7b17; color: white; background: #35230b; cursor: pointer; }
+    .artwork-picker-actions button.primary { background: #a85d0a; }
+
+    /* Screenshot-matched gallery presentation */
+    .topbar { display: none !important; }
+    .hero { display: flex !important; min-height: 104px; margin: 48px 0 18px; padding: 12px 20px; border: 1px solid rgba(183,119,25,.62); border-radius: 14px; background: radial-gradient(ellipse at 50% 50%, rgba(142,86,12,.20), transparent 62%), linear-gradient(110deg,#11100d,#19140c,#11100d); }
+    .hero-decoration { opacity: .35; background: linear-gradient(135deg,transparent 68%,rgba(183,119,25,.10) 68% 72%,transparent 72%), radial-gradient(circle at 50% 45%,rgba(183,119,25,.13),transparent 35%); }
+    .hero-title { font-size: clamp(30px,3.5vw,44px); }
+    .toolbar { display: flex !important; margin: 0 0 20px; }
+    .alphabet, .section-heading, footer { display: none !important; }
+    .search-wrap { max-width: none; }
+    #search { height: 46px; color: #fff; background: rgba(22,18,12,.94); border-color: rgba(183,119,25,.62); border-radius: 10px; }
+    #search:focus { border-color: #d99422; box-shadow: 0 0 0 3px rgba(217,148,34,.14); }
+    .count-pill { background: #15120d; border-color: rgba(183,119,25,.55); }
+    main { padding-top: 12px; }
+    body::before, body::after {
+      content: ""; position: fixed; top: 0; bottom: 0; width: 46px; z-index: 0;
+      pointer-events: none; opacity: .28;
+      background: repeating-linear-gradient(to bottom, rgba(180,119,27,.42) 0 2px, transparent 2px 11px);
+      mask-image: repeating-linear-gradient(to bottom, #000 0 2px, transparent 2px 15px);
+    }
+    body::before { left: 0; border-right: 1px solid rgba(166,104,21,.18); }
+    body::after { right: 0; border-left: 1px solid rgba(166,104,21,.18); }
+    #games {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;
+    }
+    .card {
+      aspect-ratio: 1.72 / 1; min-height: 0; display: block;
+      border: 1px solid rgba(36, 190, 180, .68); border-radius: 14px;
+      background: #111; box-shadow: 0 0 0 1px rgba(0,0,0,.65);
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .card:hover { transform: none; border-color: #45d6cb; box-shadow: 0 0 16px rgba(45, 212, 191, .28); }
+    .cover { width: 100%; height: 100%; padding: 0; border: 0; background: #111; }
+    .cover img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .cover::after {
+      content: attr(data-game-title); position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 30px 14px 13px; color: #fff; font-size: clamp(14px, 1.5vw, 19px);
+      font-weight: 850; letter-spacing: .15px; text-align: left;
+      background: linear-gradient(transparent, rgba(0,0,0,.88));
+      opacity: 0; transform: translateY(5px); transition: opacity .18s ease, transform .18s ease;
+      pointer-events: none; z-index: 2;
+    }
+    .card:hover .cover::after, .card:focus-visible .cover::after { opacity: 1; transform: translateY(0); }
+    .card-info { display: none !important; }
+    .fallback { border-radius: 0; }
+    .random-game-card { aspect-ratio: 1.72 / 1; }
+    .random-game-card .cover { height: 100%; }
+    .random-game-card .random-tag { background: rgba(150,91,12,.94); }
+    .artwork-tools { left: 7px; right: 7px; bottom: 7px; }
+    .artwork-tool-button { font-size: 10px; }
+    @media (max-width: 850px) {
+      main { padding: 58px 18px 40px; }
+      #games { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    }
+    @media (max-width: 520px) {
+      main { padding: 55px 12px 30px; }
+      #games { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .card, .random-game-card { border-radius: 10px; }
+      body::before, body::after { width: 8px; }
+    }
+
+
+
+    /* Final teal theme overrides: placed last so no earlier orange rules win. */
+    :root {
+      --border: rgba(45, 212, 191, .72);
+      --accent: #2dd4bf;
+      --surface: #101a1a;
+      --surface-hover: #102625;
+    }
+    .hero {
+      border-color: rgba(45, 212, 191, .55) !important;
+      background: radial-gradient(ellipse at 50% 50%, rgba(20,184,166,.16), transparent 62%), linear-gradient(110deg,#0c1516,#102322,#0c1516) !important;
+    }
+    .hero-decoration {
+      background: linear-gradient(135deg,transparent 68%,rgba(45,212,191,.10) 68% 72%,transparent 72%), radial-gradient(circle at 50% 45%,rgba(45,212,191,.12),transparent 35%) !important;
+    }
+    .brand-name span, .hero-title span { color: #2dd4bf !important; }
+    #search, #search:focus, .count-pill, .letter-btn,
+    .card, .random-game-card, .empty {
+      border-color: rgba(45, 212, 191, .72) !important;
+    }
+    #search:focus {
+      box-shadow: 0 0 0 3px rgba(45,212,191,.16) !important;
+    }
+    .card, .random-game-card {
+      outline: none !important;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.65) !important;
+    }
+    .card:hover, .random-game-card:hover {
+      border-color: #5eead4 !important;
+      box-shadow: 0 0 17px rgba(45,212,191,.30) !important;
+    }
+    .letter-btn:hover, .letter-btn.active {
+      background: #0f766e !important;
+      border-color: #2dd4bf !important;
+    }
+    .artwork-picker, .artwork-picker input[type=url],
+    .artwork-picker-actions button {
+      border-color: rgba(45,212,191,.75) !important;
+    }
+    .artwork-picker h3 { color: #5eead4 !important; }
+    .artwork-picker-actions button.primary { background: #0f766e !important; }
+    .artwork-tool-button.upload-artwork { background: rgba(15,118,110,.98) !important; }
+    .random-game-card .random-tag { background: rgba(15,118,110,.96) !important; }
+
+    /* Stable responsive grid: desktop 3 columns, tablet 2, phone 1. */
+    #games { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+    @media (max-width: 760px) {
+      #games { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    }
+    @media (max-width: 480px) {
+      #games { grid-template-columns: minmax(0, 1fr) !important; }
+      main { padding-left: 14px; padding-right: 14px; }
+    }
+
+    .game-player-modal { position: fixed; inset: 0; z-index: 1000; display: none; background: #000; }
+    .game-player-modal.open { display: block; }
+    .game-player-shell { width: 100vw; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: #000; }
+    .game-player-bar { flex: 0 0 48px; min-height: 48px; display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-bottom: 1px solid var(--border); background: #101010; }
+    /* In fullscreen, hide the entire game toolbar and give the game all available space. */
+    .game-player-shell:fullscreen .game-player-bar,
+    .game-player-shell.is-fullscreen .game-player-bar { display: none !important; }
+    .game-player-shell:fullscreen .game-player-frame,
+    .game-player-shell.is-fullscreen .game-player-frame { flex: 1 1 100%; width: 100%; height: 100%; }
+    .game-player-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; }
+    .game-player-action { border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; color: white; background: #20180d; cursor: pointer; font-weight: 750; white-space: nowrap; }
+    .game-player-frame { flex: 1; width: 100%; height: 100%; min-height: 0; border: 0; background: #000; }
+    .game-player-shell.hide-game-bar .game-player-bar { display:none !important; }
+    .game-player-shell.hide-game-bar .game-player-frame { flex:1 1 100%; width:100%; height:100%; }
+    .topbar { display: none !important; }
+    body.secret-artwork-mode .topbar { display: block !important; position: sticky; top: 0; }
+    .admin-add-button { margin-left: auto; border: 1px solid var(--accent); border-radius: 9px; padding: 9px 14px; color: #111; background: var(--accent); font-weight: 850; cursor: pointer; }
+    .add-game-backdrop { position: fixed; inset: 0; z-index: 1200; display: none; place-items: center; padding: 18px; background: rgba(0,0,0,.82); }
+    .add-game-backdrop.open { display: grid; }
+    .add-game-panel { width: min(560px,100%); max-height: 90vh; overflow: auto; padding: 22px; border: 1px solid var(--accent); border-radius: 14px; background: #15120d; color: #fff; box-shadow: 0 20px 70px #000b; }
+    .add-game-panel h2 { margin: 0 0 8px; color: var(--accent); }
+    .add-game-panel p { color: #b8aa92; font-size: 13px; }
+    .add-game-panel label { display: block; margin: 13px 0 6px; font-size: 13px; font-weight: 750; }
+    .add-game-panel input,.add-game-panel textarea { width: 100%; padding: 11px; border: 1px solid #72501e; border-radius: 8px; color: white; background: #090909; }
+    .add-game-panel textarea { min-height: 145px; resize: vertical; }
+    .add-game-actions { display:flex; justify-content:flex-end; gap:9px; margin-top:16px; }
+    .add-game-actions button { border:1px solid var(--accent); border-radius:8px; padding:9px 14px; color:white; background:#33220b; cursor:pointer; }
+    .add-game-actions .primary { color:#111; background:var(--accent); font-weight:850; }
+    .admin-card-actions { display:none; gap:8px; padding:0 12px 12px; }
+    .admin-card-actions button { flex:1; margin:0; padding:8px 12px; border-radius:8px; color:#fff; font-weight:800; cursor:pointer; }
+    .admin-delete-button { border:1px solid #dc5555; background:#7f1d1d; }
+    .admin-edit-button { border:1px solid #d49a36; background:#49300d; }
+    /* Keep admin controls visible even after cards are rebuilt by search/filter. */
+    body.secret-artwork-mode .admin-card-actions { display:flex !important; }
+    body.secret-artwork-mode .admin-card-actions .admin-delete-button,
+    body.secret-artwork-mode .admin-card-actions .admin-edit-button { display:inline-flex !important; align-items:center; justify-content:center; }
+    .edit-game-backdrop { position:fixed; inset:0; z-index:1300; display:none; place-items:center; padding:18px; background:rgba(0,0,0,.86); }
+    .edit-game-backdrop.open { display:grid; }
+    .edit-game-panel { width:min(560px,100%); max-height:90vh; overflow:auto; padding:22px; border:1px solid #d49a36; border-radius:14px; background:#15120d; color:#fff; box-shadow:0 20px 70px #000b; }
+    .edit-game-panel h2 { margin:0 0 8px; color:#f0b94b; }
+    .edit-game-panel p { color:#c8b99f; font-size:13px; }
+    .edit-game-panel label { display:block; margin:13px 0 6px; font-size:13px; font-weight:750; }
+    .edit-game-panel textarea { width:100%; min-height:145px; box-sizing:border-box; padding:11px; border:1px solid #72501e; border-radius:8px; color:#fff; background:#090909; resize:vertical; }
+    .edit-game-panel input { width:100%; box-sizing:border-box; padding:11px; border:1px solid #72501e; border-radius:8px; color:#fff; background:#090909; }
+    .edit-game-actions { display:flex; justify-content:flex-end; gap:9px; margin-top:16px; }
+    .edit-game-actions button { border:1px solid #9b702b; border-radius:8px; padding:9px 14px; color:#fff; background:#33220b; cursor:pointer; font-weight:750; }
+    .edit-game-actions .primary { color:#111; background:#f0b94b; border-color:#f0b94b; }
+    .delete-game-backdrop { position:fixed; inset:0; z-index:1300; display:none; place-items:center; padding:18px; background:rgba(0,0,0,.86); }
+    .delete-game-backdrop.open { display:grid; }
+    .delete-game-panel { width:min(440px,100%); padding:22px; border:1px solid #dc5555; border-radius:14px; background:#151010; color:#fff; box-shadow:0 20px 70px #000b; }
+    .delete-game-panel h2 { margin:0 0 8px; color:#ff7777; }
+    .delete-game-panel p { color:#d2baba; font-size:13px; line-height:1.5; }
+    .delete-game-panel input { width:100%; box-sizing:border-box; padding:11px; border:1px solid #9f4444; border-radius:8px; color:#fff; background:#090909; }
+    .delete-game-actions { display:flex; justify-content:flex-end; gap:9px; margin-top:16px; }
+    .delete-game-actions button { border:1px solid #9f4444; border-radius:8px; padding:9px 14px; color:#fff; background:#332020; cursor:pointer; font-weight:750; }
+    .delete-game-actions .danger { background:#991b1b; border-color:#ef4444; }
+    .delete-game-actions .danger:disabled { opacity:.45; cursor:not-allowed; }
+
+    /* Keep admin controls in normal card flow so they never cover artwork tools. */
+    body.secret-artwork-mode .topbar { display:block !important; visibility:visible !important; z-index:1000 !important; }
+    body.secret-artwork-mode #games .card:not(#random-game-card) {
+      display:flex !important; flex-direction:column !important; aspect-ratio:auto !important;
+      min-height:0 !important; overflow:hidden !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .cover {
+      position:relative !important; flex:0 0 190px !important; height:190px !important;
+      min-height:190px !important; overflow:hidden !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .artwork-tools {
+      z-index:8 !important; pointer-events:auto !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .artwork-tool-button {
+      position:relative !important; z-index:9 !important; pointer-events:auto !important;
+    }
+    body.secret-artwork-mode .card .admin-card-actions {
+      display:flex !important; position:relative !important; inset:auto !important;
+      z-index:10 !important; padding:9px !important; gap:8px !important;
+      visibility:visible !important; opacity:1 !important; pointer-events:auto !important;
+      background:#101010 !important;
+    }
+    body.secret-artwork-mode .card .admin-card-actions button {
+      display:inline-flex !important; flex:1 1 0 !important; min-height:34px !important;
+      align-items:center !important; justify-content:center !important; position:relative !important;
+      z-index:11 !important; visibility:visible !important; opacity:1 !important;
+      pointer-events:auto !important; color:#fff !important; font-size:12px !important; font-weight:850 !important;
+    }
+
+    #admin-exit-wrap {
+      display:none; position:fixed; left:0; right:0; bottom:0; z-index:99990;
+      padding:12px 16px calc(12px + env(safe-area-inset-bottom)); text-align:center;
+      background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.94) 28%);
+      pointer-events:none;
+    }
+    body.secret-artwork-mode #admin-exit-wrap { display:block; }
+    #admin-exit-button {
+      pointer-events:auto; border:1px solid #b94a4a; border-radius:10px;
+      padding:12px 24px; background:#681f1f; color:#fff; font-weight:850;
+      cursor:pointer; box-shadow:0 4px 18px rgba(0,0,0,.45);
+    }
+    #admin-exit-button:hover { background:#842626; }
+
+    /* Admin controls float over each game card on hover instead of extending the card downward. */
+    body.secret-artwork-mode #games .card:not(#random-game-card) { position:relative !important; }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .admin-card-actions {
+      position:absolute !important; left:8px !important; right:8px !important; bottom:8px !important;
+      z-index:40 !important; display:flex !important; padding:8px !important; gap:8px !important;
+      border-radius:10px !important; background:rgba(0,0,0,.88) !important;
+      opacity:0 !important; visibility:hidden !important; transform:translateY(5px) !important;
+      transition:opacity .16s ease, transform .16s ease, visibility .16s ease !important;
+      pointer-events:none !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card):hover .admin-card-actions,
+    body.secret-artwork-mode #games .card:not(#random-game-card):focus-within .admin-card-actions {
+      opacity:1 !important; visibility:visible !important; transform:translateY(0) !important;
+      pointer-events:auto !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .admin-card-actions button {
+      pointer-events:auto !important;
+    }
+    @media (hover:none) {
+      body.secret-artwork-mode #games .card:not(#random-game-card) .admin-card-actions {
+        opacity:1 !important; visibility:visible !important; transform:none !important; pointer-events:auto !important;
+      }
+    }
+
+    /* Public settings control: visible to everyone and part of page flow (not fixed). */
+    .public-settings-row { max-width:1440px; margin:0 auto; padding:12px 24px 0; display:flex; justify-content:flex-end; }
+    .site-settings-button, .feature-request-button { display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:9px; padding:9px 13px; color:var(--text); background:var(--surface); font-weight:800; cursor:pointer; text-decoration:none; }
+    .feature-request-button { border-color:var(--outline, #19b8b0); }
+    .public-settings-row { gap:9px; flex-wrap:wrap; }
+    @media (max-width:480px) { .public-settings-row { padding:10px 14px 0; } }
+    .site-settings-backdrop { display:none; position:fixed; inset:0; z-index:100500; padding:18px; background:rgba(0,0,0,.76); align-items:center; justify-content:center; }
+    .site-settings-backdrop.open { display:flex; }
+    .site-settings-panel { width:min(440px,100%); max-height:90vh; overflow:auto; padding:22px; border:1px solid var(--border); border-radius:16px; background:#111827; color:#f8fafc; box-shadow:0 20px 70px rgba(0,0,0,.6); }
+    .site-settings-panel h2 { margin:0 0 8px; }
+    .site-settings-panel p { color:#aab6c8; font-size:13px; line-height:1.5; }
+    .site-settings-field { display:grid; gap:8px; margin:18px 0; }
+    .site-settings-field label { font-size:13px; font-weight:800; }
+    .site-settings-field select { width:100%; padding:11px; border:1px solid #526078; border-radius:8px; color:#fff; background:#202b3d; }
+    .site-settings-field input[type=color] { width:100%; height:44px; padding:3px; border:1px solid #526078; border-radius:8px; background:#202b3d; }
+    .site-settings-field input[type=file] { width:100%; color:#dbe5f2; font-size:13px; }
+    .site-settings-field button { justify-self:start; padding:8px 11px; border:1px solid #526078; border-radius:8px; color:#fff; background:#263449; cursor:pointer; }
+    #personal-background-layer video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.82; }
+    .site-settings-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+    .site-settings-actions button { padding:10px 15px; border:1px solid #64748b; border-radius:8px; color:#fff; background:#263449; font-weight:800; cursor:pointer; }
+    .site-settings-actions .save { background:#b86b12; border-color:#e49a35; }
+    body.secret-artwork-mode .topbar { position:relative !important; top:auto !important; }
+    html { min-height:100%; background:#080b12; }
+    body.user-theme-active { position:relative; isolation:isolate; background:transparent !important; }
+    /* A real page-wide layer sits above the document background and behind all site content. */
+    #personal-background-layer {
+      display:none; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-repeat:repeat; background-position:center; opacity:1;
+      transform:translateZ(0); will-change:background-position,filter;
+      overflow:hidden;
+    }
+    #personal-background-layer::before, #personal-background-layer::after {
+      content:""; position:absolute; inset:-18%; pointer-events:none;
+    }
+    body.user-theme-active #personal-background-layer { display:block; }
+    body.user-theme-active > :not(#personal-background-layer) { position:relative; z-index:1; }
+    body.user-theme-active #site-settings-backdrop { position:fixed; z-index:100500; }
+
+    /* Distinct animated scenes. The theme class supplies the image so it is not
+       overwritten by the inline default-background style in the settings code. */
+    body.user-theme-active.theme-aurora #personal-background-layer {
+      background-image:
+        radial-gradient(ellipse 44% 28% at 12% 20%,rgba(0,255,214,.46),transparent 76%),
+        radial-gradient(ellipse 42% 30% at 82% 68%,rgba(48,105,255,.48),transparent 74%),
+        radial-gradient(ellipse 40% 26% at 48% 90%,rgba(205,54,255,.40),transparent 75%),
+        linear-gradient(145deg,#020812 0%,#071b2b 48%,#08091b 100%);
+      background-size:190% 190%,180% 180%,190% 190%,cover;
+      animation:inaboxAurora 19s ease-in-out infinite alternate;
+    }
+    body.user-theme-active.theme-aurora #personal-background-layer::before {
+      inset:-28% -15%;
+      background:repeating-linear-gradient(162deg,transparent 0 52px,rgba(57,255,223,.02) 62px,rgba(73,190,255,.18) 72px,rgba(183,83,255,.13) 82px,transparent 105px);
+      filter:blur(15px); animation:inaboxAuroraVeil 14s ease-in-out infinite alternate;
+    }
+    body.user-theme-active.theme-aurora #personal-background-layer::after {
+      background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.08) 43%,rgba(90,255,235,.08) 50%,transparent 68%);
+      mix-blend-mode:screen; animation:inaboxSheen 11s ease-in-out infinite alternate;
+    }
+
+    body.user-theme-active.theme-starfield #personal-background-layer {
+      background-image:
+        radial-gradient(1px 1px at 8% 18%,#fff 98%,transparent 100%),radial-gradient(2px 2px at 28% 72%,#d9f2ff 98%,transparent 100%),radial-gradient(1px 1px at 51% 34%,#fff 98%,transparent 100%),radial-gradient(2px 2px at 78% 16%,#c7d9ff 98%,transparent 100%),radial-gradient(1px 1px at 91% 78%,#fff 98%,transparent 100%),linear-gradient(150deg,#01030b,#080d22 56%,#03040d);
+      background-size:150px 150px,210px 210px,270px 270px,330px 330px,390px 390px,cover;
+      animation:inaboxStars 48s linear infinite;
+    }
+    body.user-theme-active.theme-starfield #personal-background-layer::before {
+      background:radial-gradient(ellipse 34% 22% at 28% 45%,rgba(36,103,255,.36),transparent 72%),radial-gradient(ellipse 40% 24% at 65% 52%,rgba(174,40,255,.31),transparent 72%),radial-gradient(ellipse 25% 18% at 48% 48%,rgba(255,73,178,.17),transparent 75%);
+      filter:blur(22px); animation:inaboxNebula 25s ease-in-out infinite alternate;
+    }
+    body.user-theme-active.theme-starfield #personal-background-layer::after {
+      inset:-10%;
+      background:linear-gradient(112deg,transparent 0 47%,rgba(190,225,255,.0) 48%,rgba(190,225,255,.72) 49%,rgba(190,225,255,.0) 50%,transparent 52%);
+      background-size:720px 520px; animation:inaboxMeteor 9s linear infinite; opacity:.65;
+    }
+
+    /* Classic flat neon grid: no perspective floor or added horizon effect. */
+    body.user-theme-active.theme-neongrid #personal-background-layer {
+      background-image:linear-gradient(rgba(32,220,255,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(32,220,255,.22) 1px,transparent 1px),radial-gradient(ellipse at 50% 0%,rgba(140,35,255,.24),transparent 62%),linear-gradient(180deg,#050511,#0c0924 55%,#030710);
+      background-size:48px 48px,48px 48px,100% 100%,100% 100%;
+      animation:inaboxGrid 12s linear infinite;
+    }
+    body.user-theme-active.theme-neongrid #personal-background-layer::before {
+      background:linear-gradient(90deg,transparent,rgba(0,220,255,.07),transparent);
+      filter:blur(18px); animation:inaboxGridGlow 8s ease-in-out infinite alternate;
+    }
+    body.user-theme-active.theme-neongrid #personal-background-layer::after {
+      inset:0; background:radial-gradient(circle at 20% 30%,rgba(0,230,255,.18),transparent 2px),radial-gradient(circle at 75% 68%,rgba(190,70,255,.2),transparent 3px);
+      background-size:260px 240px,340px 300px; animation:inaboxGrid 18s linear infinite reverse;
+    }
+
+    body.user-theme-active.theme-embers #personal-background-layer {
+      background-image:radial-gradient(3px 3px at 18% 82%,rgba(255,215,120,.98) 40%,transparent 72%),radial-gradient(2px 2px at 52% 72%,rgba(255,105,45,.96) 40%,transparent 72%),radial-gradient(4px 4px at 82% 90%,rgba(255,160,65,.96) 40%,transparent 72%),radial-gradient(ellipse at 50% 100%,rgba(205,65,20,.30),transparent 52%),linear-gradient(180deg,#09080d,#1d0d13 68%,#07070b);
+      background-size:170px 220px,230px 280px,300px 340px,100% 100%,100% 100%;
+      animation:inaboxEmbers 9s linear infinite;
+    }
+    body.user-theme-active.theme-embers #personal-background-layer::before {
+      background:radial-gradient(ellipse at 20% 100%,rgba(255,92,24,.18),transparent 42%),radial-gradient(ellipse at 80% 100%,rgba(255,160,55,.16),transparent 46%);
+      filter:blur(18px); animation:inaboxFireGlow 5s ease-in-out infinite alternate;
+    }
+    body.user-theme-active.theme-embers #personal-background-layer::after {
+      background-image:radial-gradient(2px 2px at 22% 75%,#ffd18a 45%,transparent 60%),radial-gradient(2px 2px at 66% 90%,#ff8b45 45%,transparent 60%),radial-gradient(1px 1px at 86% 60%,#ffe1a8 45%,transparent 60%);
+      background-size:260px 310px,340px 390px,210px 270px; animation:inaboxEmberSpark 7s linear infinite;
+    }
+
+    body.user-theme-active.theme-ocean #personal-background-layer { background:radial-gradient(ellipse at 18% 28%,rgba(0,220,210,.3),transparent 38%),radial-gradient(ellipse at 82% 72%,rgba(20,105,220,.36),transparent 42%),linear-gradient(150deg,#020d19,#052a3b 55%,#03101e); background-size:150% 150%; animation:inaboxOcean 18s ease-in-out infinite alternate; }
+    body.user-theme-active.theme-ocean #personal-background-layer::before { background:repeating-radial-gradient(ellipse at 50% 110%,transparent 0 42px,rgba(85,230,220,.08) 44px 46px,transparent 48px 80px); filter:blur(3px); animation:inaboxOcean 22s linear infinite; }
+    body.user-theme-active.theme-sunset #personal-background-layer { background:radial-gradient(ellipse at 50% 75%,rgba(255,70,160,.36),transparent 38%),linear-gradient(180deg,#100827,#35104d 48%,#a43855 78%,#160b24); background-size:160% 160%; animation:inaboxSunset 16s ease-in-out infinite alternate; }
+    body.user-theme-active.theme-sunset #personal-background-layer::before { inset:48% 0 0; background:repeating-linear-gradient(0deg,transparent 0 22px,rgba(255,120,200,.18) 23px 24px),linear-gradient(90deg,transparent 49.7%,rgba(255,150,210,.18) 50%,transparent 50.3%); mask-image:linear-gradient(transparent,#000); }
+    body.user-theme-active.theme-forest #personal-background-layer { background:radial-gradient(ellipse at 20% 20%,rgba(70,180,110,.22),transparent 38%),radial-gradient(ellipse at 80% 75%,rgba(25,110,90,.28),transparent 42%),linear-gradient(145deg,#06130f,#10291d 55%,#07120f); background-size:160% 160%; animation:inaboxOcean 24s ease-in-out infinite alternate; }
+    body.user-theme-active.theme-forest #personal-background-layer::before { background:radial-gradient(2px 2px at 20% 30%,rgba(180,255,170,.8),transparent 3px),radial-gradient(2px 2px at 75% 55%,rgba(150,255,190,.75),transparent 3px),radial-gradient(2px 2px at 45% 80%,rgba(180,255,170,.7),transparent 3px); background-size:220px 260px; animation:inaboxStars 35s linear infinite; }
+    body.user-theme-active.theme-galaxy #personal-background-layer { background:radial-gradient(ellipse at 25% 35%,rgba(145,70,255,.32),transparent 42%),radial-gradient(ellipse at 75% 65%,rgba(30,100,255,.3),transparent 45%),linear-gradient(145deg,#080416,#170d32 55%,#050816); background-size:170% 170%; animation:inaboxOcean 20s ease-in-out infinite alternate; }
+    body.user-theme-active.theme-galaxy #personal-background-layer::before { background:radial-gradient(2px 2px at 15% 20%,#fff 70%,transparent 100%),radial-gradient(1px 1px at 65% 35%,#d9c6ff 70%,transparent 100%),radial-gradient(2px 2px at 85% 75%,#fff 70%,transparent 100%); background-size:180px 190px,230px 220px,290px 270px; animation:inaboxStars 50s linear infinite; }
+    @keyframes inaboxOcean { from{background-position:0% 30%} to{background-position:100% 70%} }
+    @keyframes inaboxSunset { from{background-position:0% 30%} to{background-position:100% 80%} }
+
+    @keyframes inaboxAurora { 0%{background-position:0% 25%,100% 70%,50% 100%,center} 100%{background-position:100% 70%,0% 20%,70% 0%,center} }
+    @keyframes inaboxAuroraVeil { from{transform:translate3d(-5%,2%,0) skewY(-5deg)} to{transform:translate3d(6%,-3%,0) skewY(5deg)} }
+    @keyframes inaboxSheen { from{transform:translateX(-18%);opacity:.25} to{transform:translateX(18%);opacity:.8} }
+    @keyframes inaboxStars { from{background-position:0 0,70px 30px,140px 90px,210px 120px,center,center} to{background-position:0 1100px,70px 1350px,140px 1650px,210px 1900px,center,center} }
+    @keyframes inaboxNebula { from{transform:translate(-4%,2%) scale(.96)} to{transform:translate(5%,-3%) scale(1.08)} }
+    @keyframes inaboxTwinkle { from{opacity:.35} to{opacity:.95} }
+    @keyframes inaboxMeteor { 0%{transform:translate(-35%,-20%);opacity:0} 12%{opacity:.8} 35%{transform:translate(35%,25%);opacity:0} 100%{transform:translate(35%,25%);opacity:0} }
+    @keyframes inaboxGrid { from{background-position:0 0,0 0,0 0,0 0,center,center} to{background-position:0 104px,104px 0,0 208px,208px 0,center,center} }
+    @keyframes inaboxGridGlow { from{opacity:.25;filter:blur(5px)} to{opacity:.85;filter:blur(1px)} }
+    @keyframes inaboxEmbers { from{background-position:0 260px,70px 330px,130px 390px,center,center} to{background-position:0 -260px,70px -330px,130px -390px,center,center} }
+    @keyframes inaboxFireGlow { from{opacity:.45;transform:scaleX(.92)} to{opacity:.9;transform:scaleX(1.08)} }
+    @keyframes inaboxEmberSpark { from{background-position:0 300px,80px 390px,140px 450px} to{background-position:0 -350px,80px -430px,140px -500px} }
+    body.user-theme-active .topbar { background:var(--user-panel-bg) !important; }
+    body.user-theme-active .hero { background:var(--user-hero-bg) !important; border-color:var(--user-outline) !important; }
+    body.user-theme-active .card, body.user-theme-active .count-pill, body.user-theme-active #search, body.user-theme-active .letter-btn { border-color:var(--user-outline) !important; }
+    body.user-theme-active * { border-color:var(--user-outline); }
+
+    /* Game mode hides the library UI but leaves the standalone player iframe visible. */
+    body.game-active { overflow:hidden !important; }
+    body.game-active > :not(#game-player-modal) { display:none !important; }
+    body.game-active #game-player-modal { display:block !important; position:fixed !important; inset:0 !important; z-index:2147483000 !important; }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .artwork-tools {
+      display:flex !important; position:absolute !important; left:8px !important; right:8px !important; bottom:58px !important;
+      z-index:42 !important; gap:8px !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .artwork-tool-button.upload-artwork {
+      display:block !important; width:100% !important; min-height:36px !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .admin-card-actions {
+      display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      position:absolute !important; left:8px !important; right:8px !important; bottom:8px !important;
+      z-index:41 !important; padding:7px !important; gap:7px !important; background:rgba(0,0,0,.9) !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .admin-card-actions button {
+      width:100% !important; min-width:0 !important; min-height:36px !important; font-size:12px !important;
+    }
+
+
+    /* Final reliable admin controls: no overlapping layers or hover-only hit targets. */
+    body.secret-artwork-mode #games .card:not(#random-game-card) {
+      display:flex !important; flex-direction:column !important; height:auto !important;
+      min-height:0 !important; aspect-ratio:auto !important; overflow:visible !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .artwork-tools {
+      display:flex !important; position:absolute !important; left:8px !important; right:8px !important;
+      bottom:8px !important; z-index:12 !important; pointer-events:auto !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .admin-card-actions {
+      display:flex !important; position:relative !important; inset:auto !important; transform:none !important;
+      width:100% !important; box-sizing:border-box !important; opacity:1 !important; visibility:visible !important;
+      pointer-events:auto !important; padding:8px !important; gap:8px !important; z-index:5 !important;
+      background:rgba(0,0,0,.28) !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .admin-card-actions button {
+      display:inline-flex !important; flex:1 1 0 !important; min-width:0 !important; min-height:38px !important;
+      position:relative !important; inset:auto !important; z-index:6 !important; opacity:1 !important;
+      visibility:visible !important; pointer-events:auto !important;
+    }
+    body.secret-artwork-mode #games .card:not(#random-game-card) .artwork-tool-button.upload-artwork {
+      display:block !important; width:100% !important; min-height:36px !important;
+    }
+
+
+    /* Personal card motion: selectable in Settings; animations stay subtle and GPU-friendly. */
+    .card { transform-origin:center; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, filter .22s ease; }
+    body.card-hover-lift .card:hover { transform:translateY(-7px); box-shadow:0 15px 32px rgba(0,0,0,.34),0 0 0 1px var(--user-outline,#2dd4bf); }
+    body.card-hover-glow .card:hover { box-shadow:0 0 10px var(--user-outline,#2dd4bf),0 0 28px color-mix(in srgb,var(--user-outline,#2dd4bf) 42%,transparent); }
+    body.card-hover-tilt .card:hover { transform:perspective(850px) rotateX(2deg) rotateY(-2deg) translateY(-4px); box-shadow:0 16px 30px rgba(0,0,0,.4); }
+    body.card-hover-shine .card { overflow:hidden; }
+    body.card-hover-shine .card::after { content:""; position:absolute; inset:-40% auto -40% -70%; width:42%; transform:skewX(-18deg); background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent); transition:left .55s ease; pointer-events:none; }
+    body.card-hover-shine .card:hover::after { left:140%; }
+    body.card-hover-pop .card:hover { transform:scale(1.035); filter:brightness(1.08); }
+    body.card-hover-none .card { transition:none !important; }
+    body.card-hover-none .card:hover { transform:none !important; filter:none !important; }
+    .game-category-filters { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
+    .category-chip { border:1px solid var(--border); border-radius:999px; padding:8px 13px; color:var(--text); background:rgba(13,25,31,.88); cursor:pointer; font-size:13px; font-weight:750; transition:background .18s,border-color .18s,transform .18s; }
+    .category-chip:hover { transform:translateY(-1px); }
+    .category-chip.active { background:var(--user-outline,#0f766e); border-color:var(--user-outline,#2dd4bf); color:#041313; }
+    .favorite-toggle { position:absolute; top:9px; right:9px; z-index:4; width:36px; height:36px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.28); border-radius:50%; background:rgba(4,10,16,.78); color:#fff; font-size:19px; cursor:pointer; backdrop-filter:blur(8px); }
+    .favorite-toggle.is-favorite { color:#ff6687; border-color:rgba(255,102,135,.8); background:rgba(50,8,24,.88); }
+    @media(prefers-reduced-motion:reduce) { .card,.category-chip { transition:none !important; } }
+
+
+    /* ===== Game card hover effects (final override layer) =====
+       Earlier theme rules force box-shadow/border-color on .card:hover with !important and a
+       base .card:hover that moved the image, so the body.card-hover-* rules never won.
+       These rules come last, use higher specificity and !important so each effect is visible. */
+    body[class*="card-hover-"] .card { transform-origin:center center; will-change:transform; }
+    body.card-hover-lift .card, body.card-hover-glow .card, body.card-hover-tilt .card, body.card-hover-pop .card, body.card-hover-shine .card {
+      transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .28s ease, filter .28s ease !important;
+    }
+    body.card-hover-lift #games .card:hover { transform:translateY(-12px) !important; border-color:var(--user-outline,#2dd4bf) !important; box-shadow:0 22px 36px rgba(0,0,0,.55), 0 0 0 2px var(--user-outline,#2dd4bf) !important; }
+    body.card-hover-glow #games .card:hover { transform:none !important; border-color:var(--user-outline,#2dd4bf) !important; box-shadow:0 0 6px 2px var(--user-outline,#2dd4bf), 0 0 24px 6px var(--user-outline,#2dd4bf), 0 0 56px 12px color-mix(in srgb,var(--user-outline,#2dd4bf) 55%,transparent) !important; filter:brightness(1.1) saturate(1.15); }
+    body.card-hover-tilt #games .card { transition: transform .12s ease-out, box-shadow .25s ease !important; }
+    body.card-hover-tilt #games .card:hover { transform:perspective(700px) rotateX(var(--tilt-x,6deg)) rotateY(var(--tilt-y,-8deg)) scale(1.05) !important; box-shadow:-14px 20px 34px rgba(0,0,0,.6) !important; border-color:var(--user-outline,#2dd4bf) !important; z-index:5; }
+    body.card-hover-shine #games .card { position:relative; }
+    body.card-hover-shine #games .card::after { content:""; position:absolute; top:-20%; bottom:-20%; left:-80%; width:55%; z-index:3; pointer-events:none; transform:skewX(-20deg); background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); transition:none; }
+    body.card-hover-shine #games .card:hover::after { left:150%; transition:left .75s ease; }
+    body.card-hover-shine #games .card:hover { transform:none !important; border-color:#fff !important; box-shadow:0 0 18px color-mix(in srgb,var(--user-outline,#2dd4bf) 60%,transparent) !important; filter:brightness(1.12); }
+    body.card-hover-pop #games .card { transition: transform .35s cubic-bezier(.34,1.8,.5,1), box-shadow .25s ease, filter .25s ease !important; }
+    body.card-hover-pop #games .card:hover { transform:scale(1.09) !important; filter:brightness(1.12) saturate(1.1); box-shadow:0 10px 26px rgba(0,0,0,.5) !important; border-color:var(--user-outline,#2dd4bf) !important; z-index:5; }
+    body.card-hover-none .card, body.card-hover-none .card *, body.card-hover-none .card::after { transition:none !important; animation:none !important; }
+    body.card-hover-none #games .card:hover { transform:none !important; filter:none !important; box-shadow:0 0 0 1px rgba(0,0,0,.65) !important; }
+    body.card-hover-none #games .card:hover .cover img { transform:none !important; }
+    body.card-hover-none #games .card:hover::after { content:none !important; }
+    body[class*="card-hover-"]:not(.card-hover-none) #games .card:hover .cover img { transform:none; }
+    @media (hover:none) { body[class*="card-hover-"] #games .card:hover { transform:none !important; } }
+    @media(prefers-reduced-motion:reduce) { body[class*="card-hover-"] .card { transition:none !important; } }
+
+    /* Additional card hover styles. These work on cards created after filtering too. */
+    @keyframes cardPulseGlow {
+      0%,100% { box-shadow:0 0 0 1px var(--user-outline,#2dd4bf), 0 0 9px color-mix(in srgb,var(--user-outline,#2dd4bf) 35%,transparent); }
+      50% { box-shadow:0 0 0 2px var(--user-outline,#2dd4bf), 0 0 28px color-mix(in srgb,var(--user-outline,#2dd4bf) 85%,transparent), 0 0 48px color-mix(in srgb,var(--user-outline,#2dd4bf) 35%,transparent); }
+    }
+    body.card-hover-pulse #games .card:hover { animation:cardPulseGlow 1.15s ease-in-out infinite; border-color:var(--user-outline,#2dd4bf) !important; }
+    body.card-hover-float #games .card:hover { transform:translateY(-10px) rotate(-1deg) !important; box-shadow:0 24px 34px rgba(0,0,0,.48) !important; border-color:var(--user-outline,#2dd4bf) !important; }
+    body.card-hover-zoom #games .card:hover .cover img { transform:scale(1.16) !important; }
+    body.card-hover-zoom #games .card:hover { border-color:var(--user-outline,#2dd4bf) !important; box-shadow:0 12px 28px rgba(0,0,0,.42) !important; }
+    body.card-hover-flip #games .card:hover { transform:perspective(750px) rotateY(-7deg) rotateX(2deg) translateY(-4px) !important; box-shadow:12px 18px 30px rgba(0,0,0,.48) !important; border-color:var(--user-outline,#2dd4bf) !important; }
+    @media (hover:none), (prefers-reduced-motion:reduce) {
+      body.card-hover-pulse #games .card:hover { animation:none !important; }
+      body.card-hover-float #games .card:hover, body.card-hover-flip #games .card:hover { transform:none !important; }
+      body.card-hover-zoom #games .card:hover .cover img { transform:none !important; }
+    }
+    .site-settings-field select#settings-opening-page { width:100%; }
+
+    /* ===== Settings tile pickers, previews, help panel ===== */
+    .site-settings-panel { width:min(540px,100%) !important; }
+    .site-settings-field select.picker-hidden { display:none !important; }
+    .pick-hint { font-size:12px; color:#93a3b8; font-weight:500; }
+    .pick-grid { display:grid; grid-template-columns:repeat(var(--cols,3),minmax(0,1fr)); gap:9px; }
+    .site-settings-field .pick-tile { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:6px; width:100%; justify-self:stretch; padding:12px 6px 8px; border:1px solid #526078; border-radius:10px; background:#1a2436; color:#e8eef8; font-size:11.5px; font-weight:700; line-height:1.2; text-align:center; cursor:pointer; transition:border-color .15s, background .15s; }
+    .site-settings-field .pick-tile:hover, .site-settings-field .pick-tile:focus-visible { border-color:var(--user-outline,#2dd4bf); background:#223047; outline:none; }
+    .site-settings-field .pick-tile.selected { border-color:var(--user-outline,#2dd4bf); box-shadow:0 0 0 2px var(--user-outline,#2dd4bf); }
+    .site-settings-field .pick-tile.selected::after { content:"✓"; position:absolute; top:2px; right:6px; font-size:12px; color:var(--user-outline,#2dd4bf); }
+    .hv-card { position:relative; display:block; width:88%; aspect-ratio:1.6/1; overflow:hidden; border-radius:7px; border:1px solid rgba(45,212,191,.75); background:linear-gradient(135deg,#1f3558,#0f1727); box-shadow:0 0 0 1px rgba(0,0,0,.6); transition:transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, filter .28s ease; }
+    .hv-card::before { content:""; position:absolute; left:12%; right:12%; top:24%; height:20%; border-radius:3px; background:rgba(255,255,255,.22); box-shadow:0 8px 0 -2px rgba(255,255,255,.12); }
+    .hv-card::after { content:""; position:absolute; top:-25%; bottom:-25%; left:-70%; width:45%; transform:skewX(-20deg); background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent); opacity:0; }
+    .pick-tile[data-effect="lift"]:hover .hv-card { transform:translateY(-6px); box-shadow:0 12px 12px rgba(0,0,0,.55), 0 0 0 2px var(--user-outline,#2dd4bf); }
+    .pick-tile[data-effect="glow"]:hover .hv-card { box-shadow:0 0 5px 1px var(--user-outline,#2dd4bf), 0 0 18px 5px var(--user-outline,#2dd4bf); filter:brightness(1.15); }
+    .pick-tile[data-effect="tilt"] .hv-card { transition:transform .1s ease-out, box-shadow .25s ease; }
+    .pick-tile[data-effect="tilt"]:hover .hv-card { transform:perspective(260px) rotateX(var(--tx,7deg)) rotateY(var(--ty,-9deg)) scale(1.07); box-shadow:-8px 12px 14px rgba(0,0,0,.6); }
+    .pick-tile[data-effect="shine"]:hover .hv-card { filter:brightness(1.12); }
+    .pick-tile[data-effect="shine"]:hover .hv-card::after { opacity:1; left:140%; transition:left .7s ease; }
+    .pick-tile[data-effect="pop"] .hv-card { transition:transform .35s cubic-bezier(.34,1.8,.5,1), filter .25s ease; }
+    .pick-tile[data-effect="pop"]:hover .hv-card { transform:scale(1.14); filter:brightness(1.12); }
+    .bg-thumb { display:grid; place-items:center; width:100%; aspect-ratio:1.6/1; border-radius:7px; border:1px solid rgba(255,255,255,.16); background-size:cover; background-position:center; font-size:20px; }
+    .cur-thumb { display:block; width:100%; height:36px; background-repeat:no-repeat; background-position:center; background-size:28px 28px; font-size:22px; line-height:36px; }
+    .site-settings-field .pick-tile.cursor-tile, .site-settings-field .pick-tile.cursor-tile * { cursor:var(--tile-cursor,auto) !important; }
+    .site-settings-backdrop.previewing-bg { background:transparent !important; }
+    .site-settings-backdrop.previewing-bg .site-settings-panel { opacity:.2; transition:opacity .2s; }
+    #bg-preview-badge { position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:100600; padding:8px 14px; border-radius:999px; background:rgba(0,0,0,.78); color:#fff; font-weight:800; font-size:13px; border:1px solid var(--user-outline,#2dd4bf); pointer-events:none; display:none; }
+    .site-settings-backdrop.previewing-bg #bg-preview-badge { display:block; }
+    #personal-background-layer.bg-previewing > * { visibility:hidden; }
+    .game-player-shell { position:relative; }
+    .game-player-help-btn { width:36px; padding:7px 0; text-align:center; border-radius:50%; font-size:16px; line-height:1; }
+    .game-player-help-btn.active { background:#0f766e; border-color:#2dd4bf; }
+    .game-help-panel { position:absolute; top:56px; right:12px; z-index:6; width:min(430px,calc(100% - 24px)); max-height:calc(100% - 72px); overflow:auto; box-sizing:border-box; padding:16px 18px 18px; border:1px solid var(--border); border-radius:14px; background:rgba(12,18,30,.97); color:#f1f5f9; box-shadow:0 18px 50px rgba(0,0,0,.65); }
+    .game-help-panel[hidden] { display:none; }
+    .game-help-head { display:flex; align-items:flex-start; gap:10px; margin-bottom:6px; }
+    .game-help-head h3 { flex:1; margin:0; font-size:17px; }
+    .game-help-close { border:1px solid #526078; border-radius:8px; background:#1f2a3d; color:#fff; padding:3px 9px; cursor:pointer; font-weight:800; }
+    .game-help-panel h4 { margin:14px 0 6px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--user-outline,#2dd4bf); }
+    .game-help-panel p, .game-help-panel li { font-size:13.5px; line-height:1.5; color:#d5deec; margin:0 0 6px; }
+    .game-help-panel ul { margin:0; padding-left:18px; }
+    .game-help-controls { display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:13.5px; }
+    .game-help-controls dt { font-weight:800; color:#fff; }
+    .game-help-controls dd { margin:0; color:#d5deec; }
+    .game-help-note { margin-top:12px; padding:9px 11px; border-radius:9px; background:rgba(255,255,255,.06); font-size:12.5px; color:#b6c3d8; }
+    /* Admin dialogs (upload/paste image, add, change, delete) must float over the page like Settings.
+       The theme rule above forces every body child to position:relative, which dropped them to the page bottom. */
+    body.user-theme-active > .artwork-picker-backdrop,
+    body.user-theme-active > .add-game-backdrop,
+    body.user-theme-active > .edit-game-backdrop,
+    body.user-theme-active > .delete-game-backdrop { position:fixed !important; inset:0 !important; z-index:100400 !important; }
+    body.user-theme-active > #admin-exit-wrap { position:fixed !important; z-index:99990 !important; }
+    .artwork-picker, .edit-game-panel, .add-game-panel, .delete-game-panel { max-height:90vh; overflow:auto; }
+  </style>
+</head>
+
+<body>
+  <div id="personal-background-layer" aria-hidden="true"></div>
+  <div class="public-settings-row">
+    <a class="feature-request-button" href="https://docs.google.com/forms/d/e/1FAIpQLSfppjuvoYni2FG8db0xzoSarxbCKARlgSuodX_xw-voDir8SA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" aria-label="Request a feature or game, or report a broken or blocked game">💡 Request / Report</a>
+    <button id="site-settings-open" class="site-settings-button" type="button">⚙ Settings</button>
+  </div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><strong>InABox Games Admin</strong></div>
+      <button id="admin-add-game" class="admin-add-button" type="button">＋ Add Game</button>
+    </div>
+  </header>
+
+  <div id="site-settings-backdrop" class="site-settings-backdrop" role="dialog" aria-modal="true" aria-labelledby="site-settings-title">
+    <div class="site-settings-panel">
+      <h2 id="site-settings-title">Personal Settings</h2>
+      <p>These choices are saved only in this browser. They do not change the site for anyone else.</p>
+      <div class="site-settings-field"><label for="settings-outline">Outline color</label><input id="settings-outline" type="color" value="#19b8b0"></div>
+      <div class="site-settings-field"><label for="settings-hide-home-title">Home screen title</label><select id="settings-hide-home-title"><option value="show">Show InABox Games title</option><option value="hide">Hide home screen title banner</option></select><p style="margin:0">Hides the large title banner above the game library.</p></div>
+      <div class="site-settings-field"><label for="settings-hover-effect">Game card hover effect</label><select id="settings-hover-effect"><option value="lift">Smooth lift</option><option value="glow">Neon glow</option><option value="tilt">3D tilt</option><option value="shine">Light sweep</option><option value="pop">Soft pop</option><option value="pulse">Pulse glow</option><option value="float">Float</option><option value="zoom">Artwork zoom</option><option value="flip">3D edge tilt</option><option value="none">No animation</option></select></div>
+      <div class="site-settings-field"><label for="settings-opening-page">Default Opening Page</label><select id="settings-opening-page"><option value="home">Home</option><option value="favorites">Favorites</option></select></div>
+      <div class="site-settings-field"><label for="settings-background">Background theme</label><select id="settings-background"><option value="default">Original dark</option><option value="aurora">Aurora waves</option><option value="starfield">Moving starfield</option><option value="neongrid">Neon grid</option><option value="embers">Floating embers</option><option value="ocean">Deep ocean</option><option value="sunset">Synthwave sunset</option><option value="forest">Enchanted forest</option><option value="galaxy">Purple galaxy</option><option value="custom">My uploaded background</option></select></div>
+      <div class="site-settings-field"><label for="settings-custom-background">Upload your own animated background</label><input id="settings-custom-background" type="file" accept=".webm,.mp4,.gif,.webp,video/webm,video/mp4,image/gif,image/webp"><p id="settings-custom-status" style="margin:0">Use WebM or MP4 video, or an animated GIF/WebP. Max file size: 25 MB.</p><button id="settings-custom-remove" type="button">Remove uploaded background</button></div>
+      <div id="admin-shared-background-tools" class="site-settings-field" style="display:none;border:1px solid #526078;border-radius:10px;padding:12px;background:rgba(25,184,176,.08)">
+        <strong>Admin: Add a background for everyone</strong>
+        <label for="settings-shared-name">Background name</label><input id="settings-shared-name" type="text" maxlength="40" placeholder="e.g. Cyber City" style="width:100%;padding:10px;border:1px solid #526078;border-radius:8px;background:#202b3d;color:white">
+        <label for="settings-shared-file">Animated background file</label><input id="settings-shared-file" type="file" accept=".webm,.mp4,.gif,.webp,video/webm,video/mp4,image/gif,image/webp">
+        <button id="settings-shared-upload" type="button">Add background for everyone</button>
+        <p id="settings-shared-status" style="margin:0">Upload a looping WebM or MP4 (recommended), or animated GIF/WebP. Maximum 25 MB.</p>
+      </div>
+      <div class="site-settings-field"><label for="settings-cursor">Cursor style</label><select id="settings-cursor"><option value="default">Default arrow</option><option value="circle">Circle</option><option value="dot">Small dot</option><option value="square">Square</option><option value="diamond">Diamond</option><option value="crosshair">Crosshair</option><option value="star">Star</option><option value="bolt">Lightning bolt</option><option value="neon">Neon arrow</option><option value="pixel">Pixel arrow</option><option value="ghost">Ghost</option></select></div>
+      <div class="site-settings-actions"><button id="settings-reset" type="button">Reset</button><button id="settings-close" type="button">Close</button><button id="settings-save" class="save" type="button">Save</button></div>
+    </div>
+  </div>
+
+  <main>
+    <section class="hero" aria-label="InABox Games">
+      <div class="hero-decoration"></div>
+      <div class="hero-copy">
+        <h1 class="hero-title">
+          <img class="hero-logo" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%20width=%2264%22%20height=%2264%22%3E%20%3Cg%20stroke=%22%231c2848%22%20stroke-width=%221.6%22%20stroke-linejoin=%22round%22%20stroke-linecap=%22round%22%3E%20%3C%21--%20box%20body%20--%3E%20%3Cpath%20d=%22M13%2033%20L32%2043%20L32%2059%20L13%2049%20Z%22%20fill=%22%23c68c52%22/%3E%20%3Cpath%20d=%22M51%2033%20L32%2043%20L32%2059%20L51%2049%20Z%22%20fill=%22%23a8733f%22/%3E%20%3C%21--%20orange%20interior%20--%3E%20%3Cpath%20d=%22M32%2015%20L50%2025%20L32%2035%20L14%2025%20Z%22%20fill=%22%23ff8a00%22/%3E%20%3C%21--%20back%20flaps%20--%3E%20%3Cpath%20d=%22M14%2025%20L32%2015%20L27%206%20L9%2015%20Z%22%20fill=%22%23e9bd86%22/%3E%20%3Cpath%20d=%22M50%2025%20L32%2015%20L37%206%20L55%2015%20Z%22%20fill=%22%23dfb078%22/%3E%20%3C%21--%20front%20flaps%20--%3E%20%3Cpath%20d=%22M14%2025%20L32%2035%20L28%2046%20L8%2034%20Z%22%20fill=%22%23e2b27a%22/%3E%20%3Cpath%20d=%22M50%2025%20L32%2035%20L36%2046%20L56%2034%20Z%22%20fill=%22%23cd9a62%22/%3E%20%3C/g%3E%20%3Cpath%20d=%22M20%2025%20L32%2019%20L44%2025%20L32%2031%20Z%22%20fill=%22%23ffa52e%22%20opacity=%22.55%22/%3E%20%3C/svg%3E" alt="" aria-hidden="true">
+          <span style="color:var(--text)">InABox<span>Games</span></span>
+        </h1>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input
+          id="search"
+          type="search"
+          placeholder="Search games..."
+          autocomplete="off"
+          aria-label="Search games"
+        >
+      </div>
+      <div class="count-pill" id="count-pill">Loading...</div>
+    </section>
+
+    <nav class="alphabet" id="alphabet"
+         aria-label="Filter games by letter">
+      <button class="letter-btn active" data-letter="all">ALL</button>
+      <button class="letter-btn" data-letter="A">A</button>
+      <button class="letter-btn" data-letter="B">B</button>      <button class="letter-btn" data-letter="C">C</button>
+      <button class="letter-btn" data-letter="D">D</button>
+      <button class="letter-btn" data-letter="E">E</button>
+      <button class="letter-btn" data-letter="F">F</button>
+      <button class="letter-btn" data-letter="G">G</button>
+      <button class="letter-btn" data-letter="H">H</button>
+      <button class="letter-btn" data-letter="I">I</button>
+      <button class="letter-btn" data-letter="J">J</button>
+      <button class="letter-btn" data-letter="K">K</button>
+      <button class="letter-btn" data-letter="L">L</button>
+      <button class="letter-btn" data-letter="M">M</button>
+      <button class="letter-btn" data-letter="N">N</button>
+      <button class="letter-btn" data-letter="O">O</button>
+      <button class="letter-btn" data-letter="P">P</button>
+      <button class="letter-btn" data-letter="Q">Q</button>
+      <button class="letter-btn" data-letter="R">R</button>
+      <button class="letter-btn" data-letter="S">S</button>
+      <button class="letter-btn" data-letter="T">T</button>
+      <button class="letter-btn" data-letter="U">U</button>
+      <button class="letter-btn" data-letter="V">V</button>
+      <button class="letter-btn" data-letter="W">W</button>
+      <button class="letter-btn" data-letter="X">X</button>
+      <button class="letter-btn" data-letter="Y">Y</button>
+      <button class="letter-btn" data-letter="Z">Z</button>
+      <button class="letter-btn" data-letter="#">#</button>
+    </nav>
+
+    <section>
+      <div class="section-heading">
+        <h2>Explore Games</h2>
+        <span id="result-label">Loading your collection...</span>
+      </div>
+      <nav id="game-category-filters" class="game-category-filters" aria-label="Filter games by category"></nav>
+      <div id="games"></div>
+    </section>
+
+    <footer>
+      InABox Games · Find a game and jump right in.
+    </footer>
+  </main>
+
+  <div id="game-player-modal" class="game-player-modal" role="dialog" aria-modal="true" aria-label="Game player">
+    <div class="game-player-shell">
+      <div class="game-player-bar">
+        <div id="game-player-title" class="game-player-title">Loading game...</div>
+        <button id="game-player-fullscreen" class="game-player-action" type="button">Fullscreen</button>
+        <button id="game-player-download" class="game-player-action" type="button">Download</button>
+        <button id="game-player-close" class="game-player-action" type="button">Exit Game</button>
+      </div>
+      <iframe id="game-player-frame" class="game-player-frame" allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope; clipboard-read; clipboard-write; cross-origin-isolated" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+  </div>
+
+  <div id="add-game-backdrop" class="add-game-backdrop" role="dialog" aria-modal="true" aria-labelledby="add-game-heading">
+    <form id="add-game-form" class="add-game-panel">
+      <h2 id="add-game-heading">Add a Game</h2>
+      <p>Add a direct game URL or paste the complete embed HTML/code. The game and artwork are saved to the Apps Script catalog.</p>
+      <label for="add-game-name">Game name</label><input id="add-game-name" required maxlength="100" placeholder="Game title">
+      <label for="add-game-source">Game URL or embed code (optional when uploading a file)</label><textarea id="add-game-source" placeholder="https://example.com/game/ or paste the game's iframe/embed HTML"></textarea>
+      <label for="add-game-html-file">Or upload an HTML game file (.html or .htm, max 50 MB)</label><input id="add-game-html-file" type="file" accept=".html,.htm,text/html">
+      <label for="add-game-swf">Or upload a Flash game (.swf, max 20 MB)</label><input id="add-game-swf" type="file" accept=".swf,application/x-shockwave-flash">
+      <label for="add-game-image">Image URL (optional)</label><input id="add-game-image" type="url" placeholder="https://example.com/game-cover.jpg">
+      <label for="add-game-image-file">Or upload an image</label><input id="add-game-image-file" type="file" accept="image/*">
+      <div class="add-game-actions"><button id="add-game-cancel" type="button">Cancel</button><button id="add-game-save" class="primary" type="submit">Save Game</button></div>
+    </form>
+  </div>
+
+  <div id="delete-game-backdrop" class="delete-game-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-game-heading">
+    <form id="delete-game-form" class="delete-game-panel">
+      <h2 id="delete-game-heading">Delete Game</h2>
+      <p id="delete-game-message">This will permanently remove the game from the saved catalog. Type <strong>CONFIRM</strong> to continue.</p>
+      <label for="delete-game-confirmation">Type CONFIRM</label>
+      <input id="delete-game-confirmation" autocomplete="off" spellcheck="false" placeholder="CONFIRM" required>
+      <div class="delete-game-actions"><button id="delete-game-cancel" type="button">Cancel</button><button id="delete-game-submit" class="danger" type="submit" disabled>Delete Game</button></div>
+    </form>
+  </div>
+
+  <div id="edit-game-backdrop" class="edit-game-backdrop" role="dialog" aria-modal="true" aria-labelledby="edit-game-heading">
+    <form id="edit-game-form" class="edit-game-panel">
+      <h2 id="edit-game-heading">Change Game</h2>
+      <p>Update the game name and its URL or embed code. Existing artwork will be kept.</p>
+      <label for="edit-game-name">Game name</label>
+      <input id="edit-game-name" type="text" required autocomplete="off">
+      <label for="edit-game-source">Game URL or embed code</label>
+      <textarea id="edit-game-source" spellcheck="false"></textarea>
+      <label for="edit-game-html-file">Or upload an HTML game file (.html or .htm, max 50 MB)</label>
+      <input id="edit-game-html-file" type="file" accept=".html,.htm,text/html">
+      <label for="edit-game-help">How to play (optional)</label>
+      <textarea id="edit-game-help" spellcheck="true" style="min-height:90px" placeholder="Goal, controls, tips. One idea per line."></textarea>
+      <div class="edit-game-actions"><button id="edit-game-cancel" type="button">Cancel</button><button id="edit-game-save" class="primary" type="submit">Save Changes</button></div>
+    </form>
+  </div>
+
+  <div id="admin-exit-wrap" aria-live="polite">
+    <button id="admin-exit-button" type="button">Turn Off Admin Mode</button>
+  </div>
+
+  <script>
+    // Apps Script google.script.run compatibility bridge for the Cloudflare test host.
+    (function installAppsScriptBridge() {
+      function makeRunner(successHandler, failureHandler, userObject) {
+        return new Proxy({}, {
+          get: function (_target, property) {
+            if (property === "withSuccessHandler") return handler => makeRunner(handler, failureHandler, userObject);
+            if (property === "withFailureHandler") return handler => makeRunner(successHandler, handler, userObject);
+            if (property === "withUserObject") return value => makeRunner(successHandler, failureHandler, value);
+            if (typeof property !== "string") return undefined;
+            return function () {
+              const args = Array.prototype.slice.call(arguments);
+              fetch("/__inabox_api", {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({method:property,args:args})
+              }).then(async response => {
+                const body = await response.text();
+                let data;
+                try { data = JSON.parse(body); }
+                catch (_) { throw new Error("The Apps Script bridge returned an unreadable response."); }
+                if (!response.ok || !data || data.ok !== true) throw new Error(data && data.error || "Apps Script request failed ("+response.status+").");
+                return data.result;
+              }).then(result => {
+                if (typeof successHandler === "function") successHandler(result, userObject);
+              }).catch(error => {
+                if (typeof failureHandler === "function") failureHandler(error, userObject);
+                else console.error("Apps Script bridge call failed:", property, error);
+              });
+            };
+          }
+        });
+      }
+      window.google = window.google || {};
+      window.google.script = window.google.script || {};
+      window.google.script.run = makeRunner(null,null,null);
+    })();
+  </script>
+  <script>
+    const manualThumbnails = {
+      "20 Minutes Till Dawn":
+        "https://i.gadgets360cdn.com/products/large/ss3f37d8549730771edb65138436191cd111d002991920x1080-1422x800-1687761061616.jpg",
+
+      "Bloxorz":
+        "https://bloxorz.io/upload/imgs/bloxorz-blue-and-orange-circle.jpg",
+
+      "Appel":
+        "https://www.coolmathgames.com/sites/default/files/inline-images/How%20to%20Play%20Appel%20Gameplay.gif"
+    };
+
+    let allGames = [];
+    let selectedLetter = "all";
+    let selectedCategory = "all";
+    const favoriteStorageKey = "inabox_favorite_games_v1";
+    let favoriteGameUrls = new Set();
+    try { favoriteGameUrls = new Set(JSON.parse(localStorage.getItem(favoriteStorageKey) || "[]")); } catch (_) {}
+    const openingPageKey = "inabox_default_opening_page_v1";
+    function getOpeningPagePref() {
+      try { return localStorage.getItem(openingPageKey) === "favorites" ? "favorites" : "home"; } catch (_) { return "home"; }
+    }
+    function setOpeningPagePref(value) {
+      try { localStorage.setItem(openingPageKey, value === "favorites" ? "favorites" : "home"); } catch (_) {}
+    }
+    let initialViewApplied = false;
+    // Runs once, after game data has loaded (favorites are read from localStorage at startup).
+    function applyInitialView() {
+      if (initialViewApplied) return;
+      initialViewApplied = true;
+      selectedCategory = getOpeningPagePref() === "favorites" ? "favorites" : "all";
+    }
+    let randomImagePool = [];
+    let randomImageTimer = null;
+    let randomImagePoolSignature = "";
+    let lastRandomImageUrl = "";
+    let lastRandomGameUrl = "";
+
+    const container = document.getElementById("games");
+    const searchInput = document.getElementById("search");
+    const countPill = document.getElementById("count-pill");
+    const resultLabel = document.getElementById("result-label");
+
+    function validUrl(value) {
+      if (typeof value !== "string") return "";
+      const url = value.trim();
+      return /^https?:\/\//i.test(url) ? url : "";
+    }
+
+    const gamePlayerModal = document.getElementById("game-player-modal");
+    const gamePlayerFrame = document.getElementById("game-player-frame");
+    const gamePlayerTitle = document.getElementById("game-player-title");
+
+    let activeGame = null;
+    let gameReturnScrollY = 0;
+    let gamePreviousOverflow = "";
+    function openGame(game) {
+      const source = validUrl(game && game.playUrl);
+      const code = String(game && game.embedCode || "").trim();
+      const swfUrl = validUrl(game && game.swfUrl);
+      const isSwf = !!(game && game.swfGame && swfUrl);
+      const needsEmbedFetch = !code && !!(game && game.hasEmbed);
+      if (!source && !code && !needsEmbedFetch && !isSwf) {
+        resultLabel.textContent = "No playable embed URL was found for " + (game && game.title || "this game");
+        return;
+      }
+      gameReturnScrollY = window.scrollY || window.pageYOffset || 0;
+      gamePreviousOverflow = document.body.style.overflow || "";
+      activeGame = game;
+      gamePlayerTitle.textContent = game.title || "InABox Games";
+      if (randomImageTimer) { clearInterval(randomImageTimer); randomImageTimer = null; }
+      gamePlayerFrame.src = "about:blank";
+      gamePlayerFrame.removeAttribute("srcdoc");
+      document.body.classList.add("game-active");
+      document.body.style.overflow = "hidden";
+      gamePlayerModal.classList.add("open");
+      requestAnimationFrame(() => {
+        if (!gamePlayerModal.classList.contains("open") || activeGame !== game) return;
+        if (isSwf) {
+          loadSwfGameFromServer(game);
+        } else if (code) gamePlayerFrame.srcdoc = code;
+        else if (needsEmbedFetch) loadGameEmbedFromServer(game, source);
+        else gamePlayerFrame.src = source;
+      });
+    }
+
+    // Load SWF bytes through Apps Script in chunks. The iframe explicitly
+    // signals when Ruffle is ready, avoiding a race with iframe load events.
+    function loadSwfGameFromServer(game) {
+      const note = text => '<!doctype html><body style="margin:0;background:#000;color:#fff;font:16px system-ui,sans-serif;padding:24px">' + text + '</body>';
+      if (!(window.google && google.script && google.script.run)) {
+        gamePlayerFrame.srcdoc = note('This SWF game must be opened from the published InABOX Apps Script site.');
+        return;
+      }
+      if (!game || !game.swfFileId) {
+        gamePlayerFrame.srcdoc = note('The SWF file ID is missing from this game entry. Re-upload the SWF in Admin Mode.');
+        return;
+      }
+      const frame = gamePlayerFrame;
+      let started = false;
+      const chunkSize = 4 * 1024 * 1024;
+      const onReady = event => {
+        if (event.source !== frame.contentWindow || !event.data || event.data.type !== 'inabox-swf-ready') return;
+        if (activeGame !== game || started) return;
+        started = true;
+        window.removeEventListener('message', onReady);
+        google.script.run
+          .withSuccessHandler(meta => {
+            if (activeGame !== game) return;
+            const totalBytes = Number(meta && meta.totalBytes) || 0;
+            if (!totalBytes || totalBytes > 20 * 1024 * 1024) {
+              frame.contentWindow.postMessage({type:'inabox-swf-chunk',error:'The SWF file size is invalid or exceeds 20 MB.'}, '*');
+              return;
+            }
+            const count = Math.ceil(totalBytes / chunkSize);
+            let received = 0;
+            let failed = false;
+            for (let index = 0; index < count; index++) {
+              const offset = index * chunkSize;
+              google.script.run
+                .withSuccessHandler(result => {
+                  if (activeGame !== game || failed) return;
+                  if (!result || typeof result.chunkBase64 !== 'string' || !result.chunkBase64) {
+                    failed = true;
+                    frame.contentWindow.postMessage({type:'inabox-swf-chunk',error:'The SWF data could not be retrieved from Drive.'}, '*');
+                    return;
+                  }
+                  received++;
+                  frame.contentWindow.postMessage({type:'inabox-swf-chunk',chunkBase64:result.chunkBase64,index:index,totalChunks:count,done:received===count}, '*');
+                })
+                .withFailureHandler(error => {
+                  if (activeGame !== game || failed) return;
+                  failed = true;
+                  frame.contentWindow.postMessage({type:'inabox-swf-chunk',error:'Could not retrieve the SWF: '+(error && error.message ? error.message : 'Unknown server error')}, '*');
+                })
+                .getSwfGameChunk(game.swfFileId, offset, chunkSize);
+            }
+          })
+          .withFailureHandler(error => {
+            if (activeGame === game) frame.contentWindow.postMessage({type:'inabox-swf-chunk',error:'Could not prepare the SWF download: '+(error && error.message ? error.message : 'Unknown server error')}, '*');
+          })
+          .getSwfGameInfo(game.swfFileId);
+      };
+      window.addEventListener('message', onReady);
+      frame.onload = null;
+      frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flash Game</title><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font:16px system-ui,sans-serif}ruffle-player{display:block;width:100%;height:100%}#status{padding:20px}</style></head><body><div id="status">Starting Flash player...</div><script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script><script>
+      (function(){
+        var chunks=[], player=null, status=document.getElementById('status'), receivedChunks=0, expectedChunks=0;
+        function fail(message){status.textContent=message;status.style.padding='20px';}
+        window.addEventListener('message',function(event){
+          var data=event.data||{}; if(data.type!=='inabox-swf-chunk') return;
+          if(data.error){fail(data.error);return;}
+          if(data.chunkBase64){try{
+            var raw=atob(data.chunkBase64), bytes=new Uint8Array(raw.length);
+            for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+            if(typeof data.index==='number'){chunks[data.index]=bytes;expectedChunks=Number(data.totalChunks)||expectedChunks;receivedChunks++;}
+            else {chunks.push(bytes);receivedChunks++;}
+          }catch(e){fail('The SWF data could not be decoded: '+e.message);return;}}
+          if(data.done){try{
+            if(expectedChunks && receivedChunks!==expectedChunks){fail('The SWF download was incomplete. Please try again.');return;}
+            var total=chunks.reduce(function(n,c){return n+(c?c.length:0);},0), all=new Uint8Array(total), pos=0;
+            for(var j=0;j<chunks.length;j++){if(!chunks[j]){fail('A part of the SWF download is missing. Please try again.');return;}all.set(chunks[j],pos);pos+=chunks[j].length;}
+            if(!total){fail('The SWF file is empty.');return;}
+            if(!player){fail('Ruffle did not start. Reload the page and try again.');return;}
+            status.textContent='Starting game...';
+            player.load({data:all}).then(function(){status.remove();}).catch(function(e){fail('Ruffle could not play this SWF: '+(e&&e.message||'unsupported Flash content'));});
+          }catch(e){fail('The SWF could not be started: '+e.message);}}
+        });
+        function start(){try{
+          if(!window.RufflePlayer){fail('Ruffle could not be downloaded from unpkg.com. Check your connection or content blocker.');return;}
+          var r=window.RufflePlayer.newest(); player=r.createPlayer(); player.style.width='100%';player.style.height='100%';document.body.appendChild(player);
+          status.textContent='Downloading Flash game...'; window.parent.postMessage({type:'inabox-swf-ready'}, '*');
+        }catch(e){fail('Ruffle could not start: '+e.message);}}
+        if(document.readyState==='complete') start(); else window.addEventListener('load',start,{once:true});
+        setTimeout(function(){if(!player)fail('Ruffle is taking too long to start. Check whether unpkg.com is blocked.');},12000);
+      })();
+      <\/script></body></html>`;
+    }
+
+    // Large embedded games are stored on the server and loaded only when played.
+    function loadGameEmbedFromServer(game, fallbackUrl) {
+      const note = text => '<!doctype html><body style="margin:0;background:#000;color:#fff;font:16px system-ui,sans-serif;display:grid;place-items:center;height:100vh">' + text + '</body>';
+      gamePlayerFrame.srcdoc = note("Loading game...");
+      if (!(window.google && google.script && google.script.run)) { gamePlayerFrame.srcdoc = note("This game could not be loaded."); return; }
+      google.script.run
+        .withSuccessHandler(result => {
+          if (activeGame !== game) return;
+          const code = String(result && result.embedCode || "").trim();
+          if (code) { game.embedCode = code; gamePlayerFrame.srcdoc = code; }
+          else { game.hasEmbed = false; if (fallbackUrl) { gamePlayerFrame.removeAttribute("srcdoc"); gamePlayerFrame.src = fallbackUrl; } else gamePlayerFrame.srcdoc = note("This game could not be loaded."); }
+        })
+        .withFailureHandler(() => { if (activeGame === game) gamePlayerFrame.srcdoc = note("This game could not be loaded. Please try again."); })
+        .getGameEmbed(game.url);
+    }
+
+    function closeGame() {
+      if (!gamePlayerModal.classList.contains("open")) return;
+      gamePlayerFrame.src = "about:blank";
+      gamePlayerFrame.removeAttribute("srcdoc");
+      gamePlayerModal.classList.remove("open");
+      document.body.classList.remove("game-active");
+      activeGame = null;
+      document.body.style.overflow = gamePreviousOverflow;
+      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      requestAnimationFrame(() => {
+        window.scrollTo({left:0, top:gameReturnScrollY, behavior:"auto"});
+        if (randomImagePool.length > 1 && !randomImageTimer) randomImageTimer = setInterval(updateRandomCardImage, 2200);
+      });
+    }
+
+    document.getElementById("game-player-close").addEventListener("click", closeGame);
+    const gamePlayerShell = document.querySelector(".game-player-shell");
+    document.getElementById("game-player-fullscreen").addEventListener("click", () => {
+      if (gamePlayerShell.requestFullscreen) gamePlayerShell.requestFullscreen().catch(() => {});
+    });
+    document.addEventListener("fullscreenchange", () => {
+      gamePlayerShell.classList.toggle("is-fullscreen", document.fullscreenElement === gamePlayerShell);
+    });
+    document.getElementById("game-player-download").addEventListener("click", () => {
+      if (!activeGame) return;
+      if (activeGame.hasEmbed && !String(activeGame.embedCode || "").trim() && window.google && google.script && google.script.run) {
+        const pending = activeGame;
+        google.script.run
+          .withSuccessHandler(result => { pending.embedCode = String(result && result.embedCode || ""); if (!pending.embedCode) pending.hasEmbed = false; document.getElementById("game-player-download").click(); })
+          .withFailureHandler(() => alert("The game could not be prepared for download. Please try again."))
+          .getGameEmbed(pending.url);
+        return;
+      }
+      const gameCode = String(activeGame.embedCode || "").trim();
+      const source = validUrl(activeGame.playUrl);
+      const html = gameCode || `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${String(activeGame.title || "Game").replace(/[&<>"]/g, "")}</title><style>html,body,iframe{margin:0;width:100%;height:100%;border:0;background:#000;overflow:hidden}</style></head><body><iframe src="${source}" allow="autoplay;fullscreen;gamepad;pointer-lock" allowfullscreen></iframe></body></html>`;
+      // "From InABox Games" button: bottom-right of the downloaded page, fades out after 10 seconds.
+      const badgeHtml = '<a id="inabox-from-badge" href="https://fablesend1.github.io/InABox-Games/" target="_blank" rel="noopener noreferrer" style="position:fixed;right:14px;bottom:14px;z-index:2147483647;padding:9px 14px;border-radius:10px;background:#0f766e;color:#fff;font:700 13px/1 system-ui,Segoe UI,Arial,sans-serif;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,.5);border:1px solid #2dd4bf;transition:opacity .4s">From InABox Games</a>'
+        + '<scr' + 'ipt>setTimeout(function(){var b=document.getElementById("inabox-from-badge");if(!b)return;b.style.opacity="0";setTimeout(function(){b.remove()},450)},10000)<\/scr' + 'ipt>';
+      const finalHtml = /<\/body>/i.test(html) ? html.replace(/<\/body>(?![\s\S]*<\/body>)/i, m => badgeHtml + m) : html + badgeHtml;
+      const blob = new Blob([finalHtml], {type:"text/html"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = (String(activeGame.title || "game").toLowerCase().replace(/[^a-z0-9]+/g,"_") || "game") + ".html";
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+    });
+    gamePlayerModal.addEventListener("click", event => { if (event.target === gamePlayerModal) closeGame(); });
+    document.addEventListener("keydown", event => { if (event.key === "Escape" && gamePlayerModal.classList.contains("open")) closeGame(); });
+
+    const addGameBackdrop = document.getElementById("add-game-backdrop");
+    document.getElementById("admin-add-game").addEventListener("click", () => addGameBackdrop.classList.add("open"));
+    document.getElementById("add-game-cancel").addEventListener("click", () => addGameBackdrop.classList.remove("open"));
+    document.getElementById("add-game-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const save = document.getElementById("add-game-save");
+      const title = document.getElementById("add-game-name").value.trim();
+      let source = document.getElementById("add-game-source").value.trim();
+      const htmlFile = document.getElementById("add-game-html-file").files[0];
+      const swfFile = document.getElementById("add-game-swf").files[0];
+      const imageFile = document.getElementById("add-game-image-file").files[0];
+      const imageUrl = document.getElementById("add-game-image").value.trim();
+      if (!title) { alert("Enter a game name."); return; }
+      if (!source && !htmlFile && !swfFile) { alert("Enter a game URL/embed code or choose an HTML or SWF file."); return; }
+      if (htmlFile && !/\.html?$/i.test(htmlFile.name)) { alert("Choose an .html or .htm file."); return; }
+      if (htmlFile && htmlFile.size > 50 * 1024 * 1024) { alert("HTML files must be 50 MB or smaller."); return; }
+      if (swfFile && !/\.swf$/i.test(swfFile.name)) { alert("Choose a .swf file."); return; }
+      if (swfFile && swfFile.size > 20 * 1024 * 1024) { alert("SWF files must be 20 MB or smaller."); return; }
+      save.disabled = true; save.textContent = "Saving...";
+      const readFile = (file, asText) => new Promise((resolve, reject) => {
+        if (!file) return resolve("");
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("The file could not be read: " + file.name));
+        if (asText) reader.readAsText(file); else reader.readAsDataURL(file);
+      });
+      Promise.all([readFile(imageFile, false), readFile(swfFile, false), readFile(htmlFile, true)]).then(([imageDataUrl, swfDataUrl, htmlText]) => {
+        if (htmlText) source = htmlText;
+        const success = result => {
+          if (result && result.success && Array.isArray(result.games)) {
+            allGames = result.games; allGames.forEach((game,index) => { if (game._originalOrder == null) game._originalOrder=index; });
+            renderGames(); collectRandomImages(); updateImageCounts();
+            document.getElementById("add-game-form").reset(); addGameBackdrop.classList.remove("open");
+            resultLabel.textContent = (swfFile ? "Flash game saved: " : "Game saved: ") + result.title;
+          } else alert("The game could not be saved.");
+          save.disabled = false; save.textContent = "Save Game";
+        };
+        const failure = error => { alert(error && error.message ? error.message : String(error)); save.disabled = false; save.textContent = "Save Game"; };
+        const runner = google.script.run.withSuccessHandler(success).withFailureHandler(failure);
+        if (swfFile) runner.uploadSwfGame(adminDeviceToken, title, swfDataUrl, swfFile.name, imageUrl, imageDataUrl, imageFile ? imageFile.name : "");
+        else runner.addGameToCatalog(adminDeviceToken, title, source, imageUrl, imageDataUrl, imageFile ? imageFile.name : "");
+      }).catch(error => { alert(error && error.message ? error.message : String(error)); save.disabled = false; save.textContent = "Save Game"; });
+    });
+
+    const deleteGameBackdrop = document.getElementById("delete-game-backdrop");
+    const deleteGameForm = document.getElementById("delete-game-form");
+    const deleteGameConfirmation = document.getElementById("delete-game-confirmation");
+    const deleteGameSubmit = document.getElementById("delete-game-submit");
+    let gamePendingDeletion = null;
+
+    function openDeleteGameDialog(game) {
+      gamePendingDeletion = game;
+      document.getElementById("delete-game-message").innerHTML = "You are about to permanently delete <strong></strong> from the saved catalog. Type <strong>CONFIRM</strong> to continue.";
+      document.querySelector("#delete-game-message strong").textContent = game.title || "this game";
+      deleteGameConfirmation.value = "";
+      deleteGameSubmit.disabled = true;
+      deleteGameSubmit.textContent = "Delete Game";
+      deleteGameBackdrop.classList.add("open");
+      setTimeout(() => deleteGameConfirmation.focus(), 0);
+    }
+
+    deleteGameConfirmation.addEventListener("input", () => {
+      deleteGameSubmit.disabled = deleteGameConfirmation.value.trim() !== "CONFIRM";
+    });
+    document.getElementById("delete-game-cancel").addEventListener("click", () => {
+      deleteGameBackdrop.classList.remove("open");
+      gamePendingDeletion = null;
+    });
+    deleteGameForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!gamePendingDeletion || deleteGameConfirmation.value.trim() !== "CONFIRM") return;
+      deleteGameSubmit.disabled = true;
+      deleteGameSubmit.textContent = "Deleting...";
+      google.script.run
+        .withSuccessHandler(result => {
+          if (result && result.success && Array.isArray(result.games)) {
+            allGames = result.games;
+            allGames.forEach((game, index) => { if (game._originalOrder == null) game._originalOrder = index; });
+            renderGames(); collectRandomImages(); updateImageCounts();
+            resultLabel.textContent = "Deleted: " + (result.title || "game");
+            deleteGameBackdrop.classList.remove("open");
+            gamePendingDeletion = null;
+          } else {
+            alert("The game could not be deleted.");
+            deleteGameSubmit.disabled = false;
+            deleteGameSubmit.textContent = "Delete Game";
+          }
+        })
+        .withFailureHandler(error => {
+          alert(error && error.message ? error.message : String(error));
+          deleteGameSubmit.disabled = false;
+          deleteGameSubmit.textContent = "Delete Game";
+        })
+        .deleteGameFromCatalog(adminDeviceToken, gamePendingDeletion.url, "CONFIRM");
+    });
+
+    const editGameBackdrop = document.getElementById("edit-game-backdrop");
+    const editGameForm = document.getElementById("edit-game-form");
+    const editGameName = document.getElementById("edit-game-name");
+    const editGameSource = document.getElementById("edit-game-source");
+    const editGameHtmlFile = document.getElementById("edit-game-html-file");
+    const editGameHelp = document.getElementById("edit-game-help");
+    const editGameSave = document.getElementById("edit-game-save");
+    let gameBeingEdited = null;
+    let editGameOriginalSource = "";
+
+    function openEditGameDialog(game) {
+      gameBeingEdited = game;
+      editGameName.value = game.title || "";
+      editGameOriginalSource = game.embedCode || game.playUrl || "";
+      editGameSource.value = editGameOriginalSource;
+      editGameHtmlFile.value = "";
+      editGameSave.disabled = false;
+      if (game.hasEmbed && !game.embedCode && window.google && google.script && google.script.run) {
+        editGameSource.value = "Loading saved embed code...";
+        editGameSave.disabled = true;
+        google.script.run
+          .withSuccessHandler(result => { if (gameBeingEdited !== game) return; game.embedCode = String(result && result.embedCode || ""); editGameOriginalSource = game.embedCode || game.playUrl || ""; editGameSource.value = editGameOriginalSource; editGameSave.disabled = false; })
+          .withFailureHandler(() => { if (gameBeingEdited !== game) return; editGameOriginalSource = game.playUrl || ""; editGameSource.value = editGameOriginalSource; editGameSave.disabled = false; })
+          .getGameEmbed(game.url);
+      }
+      editGameHelp.value = game.help || "";
+      editGameBackdrop.classList.add("open");
+      setTimeout(() => editGameName.focus(), 0);
+    }
+    document.getElementById("edit-game-cancel").addEventListener("click", () => {
+      editGameBackdrop.classList.remove("open");
+      gameBeingEdited = null;
+    });
+    editGameForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!gameBeingEdited) return;
+      const htmlFile = editGameHtmlFile.files && editGameHtmlFile.files[0];
+      if (htmlFile && !/\.html?$/i.test(htmlFile.name)) { alert("Choose an .html or .htm file."); return; }
+      if (htmlFile && htmlFile.size > 50 * 1024 * 1024) { alert("HTML files must be 50 MB or smaller."); return; }
+      editGameSave.disabled = true;
+      editGameSave.textContent = htmlFile ? "Reading HTML..." : "Saving...";
+      const saveSource = source => {
+        editGameSave.textContent = "Saving...";
+        google.script.run
+        .withSuccessHandler(result => {
+          if (result && result.success) {
+            const edited = allGames.find(game => String(game.url || "") === String(result.url || ""));
+            if (edited) {
+              edited.title = result.title;
+              edited.playUrl = result.playUrl || "";
+              edited.embedCode = result.embedCode || "";
+              edited.help = result.help || "";
+              edited.hasEmbed = !!edited.embedCode;
+            }
+            renderGames(); collectRandomImages(); updateImageCounts();
+            resultLabel.textContent = "Updated game: " + (result.title || "game");
+            editGameBackdrop.classList.remove("open");
+            gameBeingEdited = null;
+          } else alert("The game URL could not be updated.");
+          editGameSave.disabled = false;
+          editGameSave.textContent = "Save Changes";
+        })
+        .withFailureHandler(error => {
+          alert(error && error.message ? error.message : String(error));
+          editGameSave.disabled = false;
+          editGameSave.textContent = "Save Changes";
+        })
+        .saveGameEditsInCatalog_v2(adminDeviceToken, gameBeingEdited.url, editGameName.value, source, editGameHelp.value);
+      };
+      if (htmlFile) {
+        const reader = new FileReader();
+        reader.onload = () => saveSource(String(reader.result || ""));
+        reader.onerror = () => { alert("The HTML file could not be read."); editGameSave.disabled = false; editGameSave.textContent = "Save Changes"; };
+        reader.readAsText(htmlFile);
+      } else {
+        saveSource(editGameSource.value);
+      }
+    });
+
+    function candidatesFor(game) {
+      const result = [];
+
+      function add(value) {
+        const url = validUrl(value);
+        if (url && !result.includes(url)) result.push(url);
+      }
+
+      // The server's saved preferred thumbnail must always be tried first.
+      // This keeps a user's chosen image from being replaced by a built-in fallback.
+      add(game.preferredThumbnail);
+      add(game.thumbnail);
+      add(game.image);
+      add(game.imageUrl);
+      add(game.image_url);
+      add(game.cover);
+      add(game.coverUrl);
+      add(game.thumbnailUrl);
+      add(game.thumbnail_url);
+      add(game.screenshot);
+      add(game.screenshotUrl);
+
+      [
+        "imageCandidates", "thumbnails", "images", "imageUrls"
+      ].forEach(key => {
+        if (!Array.isArray(game[key])) return;
+        game[key].forEach(item => {
+          if (typeof item === "string") add(item);
+          else if (item && typeof item.url === "string") add(item.url);
+        });
+      });
+
+      return result;
+    }
+
+    function isPlayableGame(game) {
+      return !!(game && (validUrl(game.playUrl) || game.hasEmbed || String(game.embedCode || "").trim()));
+    }
+
+    // The preview artwork cycles independently. Clicking Random Game always
+    // chooses a playable game at random, regardless of which image is showing.
+    // Avoid repeating the previous game when at least one other choice exists.
+    function openRandomGame() {
+      const playable = allGames.filter(isPlayableGame);
+      if (!playable.length) {
+        resultLabel.textContent = "No playable games are loaded yet";
+        return;
+      }
+      let choices = playable.filter(candidate => candidate.url !== lastRandomGameUrl);
+      if (!choices.length) choices = playable;
+      const game = choices[Math.floor(Math.random() * choices.length)];
+      lastRandomGameUrl = game.url;
+      openGame(game);
+    }
+
+    function collectRandomImages() {
+      // Include every distinct saved artwork candidate across the whole catalog.
+      // The preview image pool is independent from the playable-game selection.
+      const unique = new Map();
+      allGames.forEach(game => {
+        const visibleCover = candidatesFor(game)[0] || "";
+        if (visibleCover && !unique.has(visibleCover)) unique.set(visibleCover, { url:visibleCover, title:game.title || "Game artwork" });
+      });
+      const nextPool = [...unique.values()];
+      const nextSignature = nextPool.map(item => item.url).join("\n");
+      if (nextSignature === randomImagePoolSignature) {
+        // A previous game-open action may have paused the timer. Ensure it is running.
+        if (nextPool.length > 1 && !randomImageTimer && !gamePlayerModal.classList.contains("open")) {
+          randomImageTimer = setInterval(updateRandomCardImage, 2200);
+        }
+        return;
+      }
+
+      randomImagePool = nextPool;
+      randomImagePoolSignature = nextSignature;
+      if (!randomImagePool.some(item => item.url === lastRandomImageUrl)) lastRandomImageUrl = "";
+
+      if (randomImageTimer) clearInterval(randomImageTimer);
+      randomImageTimer = null;
+      const card = document.getElementById("random-game-card");
+      if (card && randomImagePool.length) updateRandomCardImage();
+      if (randomImagePool.length > 1) randomImageTimer = setInterval(updateRandomCardImage, 2200);
+    }
+
+    let randomImageLoading = false, randomShownItem = null, randomShownImg = null;
+    function paintRandomCover(cover, img, item) {
+      cover.replaceChildren();
+      img.className = "random-card-image";
+      cover.appendChild(img);
+      const tag = document.createElement("span");
+      tag.className = "random-tag";
+      tag.textContent = "RANDOM PICK";
+      cover.appendChild(tag);
+      cover.dataset.imageStatus = "loaded";
+    }
+    // Shows a different random game's artwork every second. The old version started a new
+    // request every second and ignored any image that took longer than a second to load, so
+    // the picture often never changed. Now a load in progress is never cancelled.
+    function updateRandomCardImage() {
+      const card = document.getElementById("random-game-card");
+      if (!card || !randomImagePool.length) return;
+      if (randomImageLoading) return;
+      let choices = randomImagePool.filter(item => item.url !== lastRandomImageUrl);
+      if (!choices.length) choices = randomImagePool;
+      const item = choices[Math.floor(Math.random() * choices.length)];
+      randomImageLoading = true;
+      const img = new Image();
+      img.alt = "Random game artwork preview: " + item.title;
+      img.referrerPolicy = "no-referrer";
+      let finished = false;
+      const finish = ok => {
+        if (finished) return;
+        finished = true; clearTimeout(timer); randomImageLoading = false;
+        if (!ok) return;
+        lastRandomImageUrl = item.url; randomShownItem = item; randomShownImg = img;
+        const liveCard = document.getElementById("random-game-card");
+        const cover = liveCard && liveCard.querySelector(".cover");
+        if (cover) paintRandomCover(cover, img, item);
+      };
+      const timer = setTimeout(() => finish(false), 6000);
+      img.onload = () => finish(true);
+      img.onerror = () => {
+        randomImagePool = randomImagePool.filter(candidate => candidate.url !== item.url);
+        randomImagePoolSignature = randomImagePool.map(candidate => candidate.url).join("\n");
+        finish(false);
+      };
+      img.src = item.url;
+    }
+
+    function createFallback(title) {
+      const fallback = document.createElement("div");
+      fallback.className = "fallback";
+      fallback.textContent =
+        (String(title).trim().charAt(0) || "?").toUpperCase();
+      return fallback;
+    }
+
+    function updateImageCounts() {
+      const covers = [...document.querySelectorAll(".cover")];
+
+      const loaded = covers.filter(cover =>
+        cover.dataset.imageStatus === "loaded"
+      ).length;
+
+      const finished = covers.filter(cover =>
+        cover.dataset.imageStatus === "loaded" ||
+        cover.dataset.imageStatus === "missing"
+      ).length;
+
+      countPill.textContent = allGames.length + " games";
+
+      resultLabel.textContent = finished < covers.length
+        ? loaded + " images loaded · checking artwork..."
+        : loaded + " images loaded";
+    }
+
+    function loadImage(cover, title, urls, index) {
+      if (index >= urls.length) {
+        // Keep the secret-mode artwork controls in place when no image loads.
+        const existingImage = cover.querySelector("img");
+        if (existingImage) existingImage.remove();
+        const existingFallback = cover.querySelector(".fallback");
+        if (existingFallback) {
+          existingFallback.replaceWith(createFallback(title));
+        } else {
+          const tools = cover.querySelector(".artwork-tools");
+          if (tools) cover.insertBefore(createFallback(title), tools);
+          else cover.appendChild(createFallback(title));
+        }
+        cover.dataset.imageStatus = "missing";
+        updateImageCounts();
+        return;
+      }
+
+      const img = new Image();
+      img.alt = title + " game artwork";
+      img.referrerPolicy = "no-referrer";
+
+      img.onload = function() {
+        if (!img.naturalWidth || !img.naturalHeight) {
+          loadImage(cover, title, urls, index + 1);
+          return;
+        }
+
+        // Replace only the artwork node so the secret-mode button stays in the cover.
+        const existingImage = cover.querySelector("img");
+        if (existingImage) {
+          existingImage.replaceWith(img);
+        } else {
+          const fallback = cover.querySelector(".fallback");
+          if (fallback) fallback.replaceWith(img);
+          else cover.prepend(img);
+        }
+        cover.dataset.imageStatus = "loaded";
+        cover.dataset.currentImage = urls[index];
+        updateImageCounts();
+        if (cover.isConnected) collectRandomImages();
+      };
+
+      img.onerror = function() {
+        loadImage(cover, title, urls, index + 1);
+      };
+
+      img.src = urls[index];
+    }
+
+    // Secret-mode manual artwork upload / URL picker.
+    let artworkPickerGame = null;
+    let artworkPickerCover = null;
+    let artworkPickerButton = null;
+    const artworkPickerBackdrop = document.createElement("div");
+    artworkPickerBackdrop.className = "artwork-picker-backdrop";
+    artworkPickerBackdrop.innerHTML = `
+      <div class="artwork-picker" role="dialog" aria-modal="true" aria-labelledby="artwork-picker-title">
+        <h3 id="artwork-picker-title">Set game artwork</h3>
+        <p id="artwork-picker-game"></p>
+        <input id="artwork-image-url" type="url" placeholder="Paste an image URL (https://...)" autocomplete="off">
+        <input id="artwork-image-file" type="file" accept="image/*">
+        <div class="artwork-picker-actions">
+          <button type="button" id="artwork-picker-cancel">Cancel</button>
+          <button type="button" class="primary" id="artwork-picker-save">Save for everyone</button>
+        </div>
+      </div>`;
+    document.body.appendChild(artworkPickerBackdrop);
+    function openArtworkPicker(game, cover, button) {
+      artworkPickerGame = game; artworkPickerCover = cover; artworkPickerButton = button;
+      artworkPickerBackdrop.querySelector("#artwork-picker-game").textContent = game.title || "Selected game";
+      artworkPickerBackdrop.querySelector("#artwork-image-url").value = "";
+      artworkPickerBackdrop.querySelector("#artwork-image-file").value = "";
+      artworkPickerBackdrop.classList.add("open");
+      artworkPickerBackdrop.querySelector("#artwork-image-url").focus();
+    }
+    artworkPickerBackdrop.querySelector("#artwork-picker-cancel").addEventListener("click", () => artworkPickerBackdrop.classList.remove("open"));
+    artworkPickerBackdrop.addEventListener("click", event => { if (event.target === artworkPickerBackdrop) artworkPickerBackdrop.classList.remove("open"); });
+    artworkPickerBackdrop.querySelector("#artwork-picker-save").addEventListener("click", async () => {
+      if (!artworkPickerGame || !artworkPickerCover) return;
+      const urlInput = artworkPickerBackdrop.querySelector("#artwork-image-url");
+      const fileInput = artworkPickerBackdrop.querySelector("#artwork-image-file");
+      const url = urlInput.value.trim();
+      const file = fileInput.files && fileInput.files[0];
+      const saveButton = artworkPickerBackdrop.querySelector("#artwork-picker-save");
+      saveButton.disabled = true; saveButton.textContent = "Saving...";
+      try {
+        if (url) {
+          if (!/^https?:\/\//i.test(url)) throw new Error("Please use a valid http or https image URL.");
+          const ok = await applyArtwork(artworkPickerGame, artworkPickerCover, url, artworkPickerButton);
+          if (!ok) throw new Error("That image could not be loaded or saved. The current image was kept.");
+        } else if (file) {
+          if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
+          if (file.size > 5 * 1024 * 1024) throw new Error("Please choose an image smaller than 5 MB.");
+          if (!(typeof google !== "undefined" && google.script && google.script.run)) throw new Error("The gallery is not connected to Apps Script.");
+          const dataUrl = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });
+          const result = await new Promise((resolve, reject) => {
+            google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadArtworkForGame(adminDeviceToken, artworkPickerGame.url, dataUrl, file.name);
+          });
+          if (!result || !result.success || !result.thumbnail) throw new Error(result && result.message || "The upload could not be saved.");
+          const applied = await applyArtwork(artworkPickerGame, artworkPickerCover, result.thumbnail, null);
+          if (!applied) throw new Error("The image uploaded, but the card could not display it yet. Reload to check the saved image.");
+        } else {
+          throw new Error("Paste an image URL or choose an image file.");
+        }
+        artworkPickerBackdrop.classList.remove("open");
+      } catch (error) {
+        alert(error && error.message ? error.message : String(error));
+      } finally { saveButton.disabled = false; saveButton.textContent = "Save for everyone"; }
+    });
+
+    // Secret feature: type LET ME IN. The 10-second window starts with the
+    // first key typed, so slow page loading or an unfocused embed won't eat the window.
+    let secretPhraseBuffer = "";
+    let secretPhraseStartedAt = 0;
+    let secretModeEnabled = false;
+    const ADMIN_DEVICE_TOKEN_KEY = "inabox_admin_device_token_v1";
+    const ADMIN_MODE_ENABLED_KEY = "inabox_admin_mode_enabled_v1";
+    let adminDeviceToken = localStorage.getItem(ADMIN_DEVICE_TOKEN_KEY) || "";
+
+    function activateAdminMode() {
+      secretModeEnabled = true;
+      localStorage.setItem(ADMIN_MODE_ENABLED_KEY, "1");
+      document.body.classList.add("secret-artwork-mode");
+      renderGames();
+      document.querySelectorAll(".admin-card-actions").forEach(actions => {
+        actions.style.setProperty("display", "flex", "important");
+        actions.style.setProperty("visibility", "visible", "important");
+        actions.style.setProperty("z-index", "30", "important");
+      });
+      document.querySelectorAll(".admin-card-actions button").forEach(button => {
+        button.style.setProperty("display", "inline-flex", "important");
+        button.style.setProperty("visibility", "visible", "important");
+        button.style.setProperty("opacity", "1", "important");
+      });
+    }
+
+    function deactivateAdminMode() {
+      // Hide admin controls for now, but keep this browser's authorization token.
+      // Typing LET ME IN again re-enables admin mode without another password prompt.
+      secretModeEnabled = false;
+      localStorage.removeItem(ADMIN_MODE_ENABLED_KEY);
+      secretPhraseBuffer = "";
+      secretPhraseStartedAt = 0;
+      document.body.classList.remove("secret-artwork-mode");
+      renderGames();
+      resultLabel.textContent = "Admin mode turned off. Type LET ME IN to turn it back on.";
+    }
+
+    document.getElementById("admin-exit-button").addEventListener("click", deactivateAdminMode);
+
+    function verifyAdminPassword() {
+      if (document.getElementById("admin-password-overlay")) return;
+      const overlay = document.createElement("div");
+      overlay.id = "admin-password-overlay";
+      Object.assign(overlay.style, { position:"fixed", inset:"0", zIndex:"100000", display:"flex", alignItems:"center", justifyContent:"center", padding:"20px", background:"rgba(0,0,0,.82)" });
+      const panel = document.createElement("form");
+      Object.assign(panel.style, { width:"min(420px, 100%)", boxSizing:"border-box", padding:"24px", borderRadius:"16px", border:"1px solid #444", background:"#171717", color:"#fff", boxShadow:"0 18px 60px rgba(0,0,0,.55)" });
+      const heading = document.createElement("h2");
+      heading.textContent = "Admin verification";
+      Object.assign(heading.style, { margin:"0 0 8px", fontSize:"22px" });
+      const description = document.createElement("p");
+      description.textContent = "Enter your admin password to authorize this device. You will not need to enter it again on this browser.";
+      Object.assign(description.style, { margin:"0 0 16px", color:"#bbb", lineHeight:"1.45" });
+      const input = document.createElement("input");
+      input.type = "password"; input.autocomplete = "current-password"; input.placeholder = "Admin password"; input.required = true;
+      Object.assign(input.style, { width:"100%", boxSizing:"border-box", padding:"12px", borderRadius:"9px", border:"1px solid #555", background:"#080808", color:"#fff", fontSize:"16px", marginBottom:"14px" });
+      const buttons = document.createElement("div");
+      Object.assign(buttons.style, { display:"flex", justifyContent:"flex-end", gap:"10px" });
+      const cancel = document.createElement("button"); cancel.type = "button"; cancel.textContent = "Cancel";
+      const submit = document.createElement("button"); submit.type = "submit"; submit.textContent = "Verify device";
+      [cancel, submit].forEach(button => Object.assign(button.style, { padding:"10px 14px", borderRadius:"8px", border:"1px solid #555", cursor:"pointer", fontWeight:"700", color:"#fff", background:button === submit ? "#d88920" : "#333" }));
+      cancel.addEventListener("click", () => overlay.remove());
+      buttons.append(cancel, submit); panel.append(heading, description, input, buttons); overlay.appendChild(panel); document.body.appendChild(overlay);
+      panel.addEventListener("submit", event => {
+        event.preventDefault();
+        if (!input.value) return;
+        if (!(window.google && google.script && google.script.run)) {
+          submit.disabled = false; submit.textContent = "Try again";
+          description.textContent = "The Apps Script connection is unavailable. Open the deployed /exec page inside its embed and try again.";
+          return;
+        }
+        submit.disabled = true; submit.textContent = "Verifying...";
+        description.textContent = "Checking your password…";
+        let completed = false;
+        const timeoutId = setTimeout(() => {
+          if (completed) return;
+          completed = true; submit.disabled = false; submit.textContent = "Try again";
+          description.textContent = "Verification timed out. Check that Code.gs is updated and the web app is deployed as /exec, then try again.";
+        }, 15000);
+        google.script.run
+          .withSuccessHandler(result => {
+            if (completed) return; completed = true; clearTimeout(timeoutId);
+            if (!result || !result.success || !result.token) { submit.disabled = false; submit.textContent = "Try again"; description.textContent = "The server did not return a device token. Check your Script Properties and try again."; return; }
+            adminDeviceToken = result.token;
+            try { localStorage.setItem(ADMIN_DEVICE_TOKEN_KEY, adminDeviceToken); } catch (_) {}
+            overlay.remove();
+            activateAdminMode();
+            resultLabel.textContent = "Admin mode enabled on this device";
+          })
+          .withFailureHandler(error => {
+            if (completed) return; completed = true; clearTimeout(timeoutId);
+            submit.disabled = false; submit.textContent = "Verify device";
+            description.textContent = error && error.message ? error.message : String(error || "Verification failed.");
+            input.focus();
+          })
+          .authorizeAdminDevice(input.value);
+      });
+      overlay.addEventListener("click", event => { if (event.target === overlay) overlay.remove(); });
+      input.focus();
+    }
+
+    if (adminDeviceToken) {
+      const shouldRestoreAdminMode = localStorage.getItem(ADMIN_MODE_ENABLED_KEY) === "1";
+      google.script.run
+        .withSuccessHandler(valid => {
+          if (valid) { if (shouldRestoreAdminMode) activateAdminMode(); }
+          else { adminDeviceToken = ""; localStorage.removeItem(ADMIN_DEVICE_TOKEN_KEY); localStorage.removeItem(ADMIN_MODE_ENABLED_KEY); }
+        })
+        .withFailureHandler(() => { adminDeviceToken = ""; localStorage.removeItem(ADMIN_DEVICE_TOKEN_KEY); localStorage.removeItem(ADMIN_MODE_ENABLED_KEY); })
+        .validateAdminDevice(adminDeviceToken);
+    }
+
+    function checkSecretPhrase(event) {
+      if (secretModeEnabled || event.ctrlKey || event.altKey || event.metaKey) return;
+      let key = event.key;
+      if (event.code === "Space" || key === "Spacebar") key = " ";
+      if (!key || key.length !== 1) return;
+      const now = Date.now();
+      if (!secretPhraseStartedAt || now - secretPhraseStartedAt > 10000) {
+        secretPhraseBuffer = "";
+        secretPhraseStartedAt = now;
+      }
+      secretPhraseBuffer = (secretPhraseBuffer + key.toUpperCase()).slice(-9);
+      if (secretPhraseBuffer === "LET ME IN" && now - secretPhraseStartedAt <= 10000) {
+        if (adminDeviceToken) activateAdminMode();
+        else verifyAdminPassword();
+      }
+    }
+    window.addEventListener("keydown", checkSecretPhrase, true);
+
+    function saveChosenArtwork(game, url) {
+      return new Promise((resolve, reject) => {
+        if (!(typeof google !== "undefined" && google.script && google.script.run)) {
+          reject(new Error("Gallery is not connected to Apps Script; shared artwork cannot be saved."));
+          return;
+        }
+        google.script.run
+          .withSuccessHandler(result => {
+            if (result && result.success && result.thumbnail === url) resolve(result);
+            else reject(new Error("The server did not confirm the artwork save."));
+          })
+          .withFailureHandler(error => reject(error || new Error("Artwork save failed.")))
+          .setPreferredArtworkForGame(adminDeviceToken, game.url, url);
+      });
+    }
+
+    async function applyArtwork(game, cover, url, button) {
+      return new Promise(resolve => {
+        const image = new Image();
+        image.referrerPolicy = "no-referrer";
+        image.onload = async () => {
+          if (!image.naturalWidth || !image.naturalHeight) { resolve(false); return; }
+          try {
+            // Save to the shared server-side Drive catalog BEFORE changing the card.
+            // Other visitors and future reloads will therefore get this same image.
+            await saveChosenArtwork(game, url);
+          } catch (error) {
+            console.warn("Could not save selected artwork for everyone:", error);
+            if (button) {
+              button.textContent = "Save failed — kept old image";
+              setTimeout(() => {
+                if (button.isConnected) button.textContent = button.dataset.defaultLabel || button.textContent;
+              }, 2200);
+            }
+            resolve(false);
+            return;
+          }
+
+          const oldImage = cover.querySelector("img");
+          image.alt = (game.title || "Game") + " game artwork";
+          image.style.width = "100%";
+          image.style.height = "100%";
+          image.style.objectFit = "contain";
+          if (oldImage) oldImage.replaceWith(image);
+          else {
+            const fallback = cover.querySelector(".fallback");
+            if (fallback) fallback.replaceWith(image);
+            else cover.prepend(image);
+          }
+          cover.dataset.currentImage = url;
+          cover.dataset.imageStatus = "loaded";
+          game.preferredThumbnail = url;
+          game.thumbnail = url;
+          game.imageCandidates = [url].concat(candidatesFor(game).filter(item => item !== url));
+          if (cover.isConnected) collectRandomImages();
+          if (button) button.disabled = false;
+          updateImageCounts();
+          resolve(true);
+        };
+        image.onerror = () => resolve(false);
+        image.src = url;
+      });
+    }
+
+    async function switchSavedImage(game, cover, button) {
+      const current = cover.dataset.currentImage || (cover.querySelector("img") || {}).src || "";
+      const localOptions = candidatesFor(game).filter(url => url && url !== current);
+      button.disabled = true;
+      button.textContent = "Checking saved images...";
+
+      // Ask Apps Script for the shared saved candidates as well. The local card
+      // may only have received its currently selected thumbnail from the server.
+      let serverOptions = [];
+      try {
+        if (typeof google !== "undefined" && google.script && google.script.run) {
+          const result = await new Promise((resolve, reject) => {
+            google.script.run
+              .withSuccessHandler(resolve)
+              .withFailureHandler(reject)
+              .getSavedArtworkAlternativesForGame(game.url, current);
+          });
+          if (result && Array.isArray(result.alternatives)) serverOptions = result.alternatives;
+        }
+      } catch (error) {
+        console.warn("Could not load shared alternate artwork:", error);
+      }
+
+      const options = [...new Set([...localOptions, ...serverOptions])]        .filter(url => url && url !== current);
+      if (!options.length) {
+        button.disabled = false;
+        button.textContent = "No saved alternate";
+        setTimeout(() => { if (button.isConnected) button.textContent = "Switch Img"; }, 1800);
+        return;
+      }
+
+      button.textContent = "Switching...";
+      for (const url of options) {
+        if (await applyArtwork(game, cover, url, button)) {
+          button.disabled = false;
+          button.textContent = "Image changed!";
+          setTimeout(() => { if (button.isConnected) button.textContent = "Switch Img"; }, 1500);
+          return;
+        }
+      }
+      button.disabled = false;
+      button.textContent = "No working alternate";
+      setTimeout(() => { if (button.isConnected) button.textContent = "Switch Img"; }, 1800);
+    }
+
+    function searchNewImage(game, cover, button) {
+      if (!(typeof google !== "undefined" && google.script && google.script.run)) {
+        button.textContent = "Open Apps Script gallery";
+        setTimeout(() => { if (button.isConnected) button.textContent = "Search for a new image"; }, 1800);
+        return;
+      }
+      button.disabled = true;
+      button.textContent = "Searching title...";
+      google.script.run
+        .withFailureHandler(error => {
+          console.warn("New artwork search failed:", error);
+          button.disabled = false;
+          button.textContent = "Search failed";
+          setTimeout(() => { if (button.isConnected) button.textContent = "Search for a new image"; }, 1800);
+        })
+        .withSuccessHandler(async result => {
+          const alternatives = result && result.success && Array.isArray(result.alternatives) ? result.alternatives : [];
+          if (!alternatives.length) {
+            button.disabled = false;
+            button.textContent = "No new image found";
+            setTimeout(() => { if (button.isConnected) button.textContent = "Search for a new image"; }, 1800);
+            return;
+          }
+          const current = cover.dataset.currentImage || (cover.querySelector("img") || {}).src || "";
+          const options = alternatives.filter(url => url && url !== current);
+          for (const url of options) {
+            if (await applyArtwork(game, cover, url, button)) {
+              button.disabled = false;
+              button.textContent = "Found an image!";
+              setTimeout(() => { if (button.isConnected) button.textContent = "Search for a new image"; }, 1800);
+              return;
+            }
+          }
+          button.disabled = false;
+          button.textContent = "No working new image";
+          setTimeout(() => { if (button.isConnected) button.textContent = "Search for a new image"; }, 1800);
+        })
+        .findAlternateArtworkForGame(adminDeviceToken, game.url);
+    }
+
+    function matchesLetter(title) {
+      if (selectedLetter === "all") return true;
+
+      const first = String(title).trim().charAt(0).toUpperCase();
+
+      if (selectedLetter === "#") return !/[A-Z]/.test(first);
+      return first === selectedLetter;
+    }
+
+    // Keep the original game order; the sort dropdown has been removed.
+
+    function categoriesForGame(game) {
+      const t = String(game.title || "").toLowerCase();
+      const u = String(game.url || "").toLowerCase();
+      const s = t + " " + u;
+      const categories = [];
+      const add = name => { if (!categories.includes(name)) categories.push(name); };
+
+      // Genre categories are intentionally multi-select: a game can appear in
+      // more than one useful category instead of being hidden by the first match.
+      if (/horror|scary|haunt|fear|granny|backrooms|fnaf|five nights|nun massacre|doors|dark deception/.test(s)) add("Horror");
+      if (/racing|race|drift|kart|car|bike|motorcycle|motocross|polytrack|traffic/.test(s)) add("Racing");
+      if (/soccer|football|basketball|pool|golf|tennis|baseball|sports|archery|bowling|volleyball|hockey|boxing|wrestling/.test(s)) add("Sports");
+      if (/chess|2048|puzzle|wordle|sudoku|bloxorz|mahjong|brain|block blast|unblock|nonogram|crossword|jigsaw|minesweeper|connections|sokoban|tetris|sugar|angry birds|cut the rope|bad piggies|where.?s my water|flow free|color switch|the impossible quiz/.test(s)) add("Puzzle");
+      if (/tower|strategy|war|battle|defense|kingdom|age of|bloons|plants vs zombies|civilization|worldbox|stick war|kingdom rush|balatro|roguelike|deck.?builder|card battler/.test(s)) add("Strategy");
+      if (/multiplayer|\.io|1v1|2 player|two player|among us|agar|slither|shell shockers|krunker|ev\.io|buildnow|smash karts|gang beasts|brawlhalla/.test(s)) add("Multiplayer");
+      if (/platform|obby|jump|parkour|mario|sonic|appel|ovo|geometry dash|subway surfers|fireboy|ice girl|run 3|vex|dadish|sausage flip|super meat boy|hollow knight|celeste|cuphead|ori and|jetpack joyride/.test(s)) add("Platformer");
+      if (/shooter|gun|archero|sniper|zombie|bullet|combat|bacon may die|20 minutes till dawn|vampire survivors|zombs|survivor|doom|ultrakill|deadshot|awesome tanks|castle crasher|gang beasts|0v0/.test(s)) add("Action");
+
+      // PC Games is an additional platform collection, not a replacement genre.
+      // Include recognizable PC-first / PC-native titles and keep their genres too.
+      if (/balatro|hollow knight|gang beasts|20 minutes till dawn|castle crashers?|terraria|minecraft|cuphead|undertale|celeste|stardew valley|slay the spire|binding of isaac|super meat boy|spelunky|broforce|risk of rain|dead cells|vampire survivors|ultrakill|portal|half-life|team fortress|counter strike|left 4 dead|don.?t starve|enter the gungeon|hades|ori and|limbo|inside|fez|papers please|factorio|rimworld|the escapists|human fall flat|little nightmares|hollowknight|terraria|geometry dash|brawlhalla/.test(s)) add("PC Games");
+
+      // Give uncategorized casual browser games a useful home; there is no
+      // generic catch-all genre bucket anymore.
+      if (!categories.length) add("Casual");
+      return categories;
+    }
+    function categoryForGame(game) { return categoriesForGame(game)[0]; }
+    function saveFavorites() { try { localStorage.setItem(favoriteStorageKey, JSON.stringify([...favoriteGameUrls])); } catch (_) {} }
+    function renderCategoryFilters() {
+      const nav = document.getElementById("game-category-filters");
+      if (!nav) return;
+      const categoryOrder = ["Horror","Racing","Sports","Puzzle","Strategy","Multiplayer","Platformer","Action","Casual","PC Games"];
+      const present = new Set(allGames.flatMap(categoriesForGame));
+      const categories = ["all","favorites", ...categoryOrder.filter(category => present.has(category))];
+      nav.replaceChildren();
+      categories.forEach(category => {
+        const b=document.createElement("button"); b.type="button"; b.className="category-chip"+(selectedCategory===category?" active":"");
+        b.textContent=category==="all"?"All Games":category==="favorites"?"♥ Favorites":category;
+        b.addEventListener("click",()=>{selectedCategory=category;renderGames();}); nav.appendChild(b);
+      });
+    }
+
+    function renderGames() {
+      const query = searchInput.value.trim().toLowerCase();
+
+      const filtered = allGames.filter(game => {
+        const title = String(game.title || "Untitled Game");
+        const categoryMatch = selectedCategory === "all" || (selectedCategory === "favorites" ? favoriteGameUrls.has(String(game.url || "")) : categoriesForGame(game).includes(selectedCategory));
+        return title.toLowerCase().includes(query) && matchesLetter(title) && categoryMatch;
+      });
+      container.replaceChildren();
+      renderCategoryFilters();
+
+      const randomCard = document.createElement("button");
+      randomCard.type = "button";
+      randomCard.id = "random-game-card";
+      randomCard.className = "card random-game-card";
+      randomCard.setAttribute("aria-label", "Open a randomly selected game");
+      const randomCover = document.createElement("div");
+      randomCover.className = "cover";
+      randomCover.dataset.imageStatus = "loading";
+      randomCover.appendChild(createFallback("Random Game"));
+      const randomInfo = document.createElement("div");
+      randomInfo.className = "card-info";
+      const randomTitle = document.createElement("div");
+      randomTitle.className = "title";
+      randomTitle.textContent = "🎲 Random Game";
+      const randomPlay = document.createElement("div");
+      randomPlay.className = "play-label";
+      randomPlay.textContent = "▶  PICK A GAME";
+      randomInfo.append(randomTitle, randomPlay);
+      randomCard.append(randomCover, randomInfo);
+      randomCard.addEventListener("click", openRandomGame);
+      container.appendChild(randomCard);
+      if (randomShownImg && randomShownItem && randomShownImg.complete && randomShownImg.naturalWidth) paintRandomCover(randomCover, randomShownImg, randomShownItem);
+
+      resultLabel.textContent =
+        filtered.length + (filtered.length === 1 ? " game" : " games");
+
+      if (filtered.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+
+        const heading = document.createElement("strong");
+        const noFavorites = selectedCategory === "favorites" && favoriteGameUrls.size === 0 && !query && selectedLetter === "all";
+        heading.textContent = noFavorites ? "No favorites yet" : "No games found";
+
+        const message = document.createElement("span");
+        message.textContent = noFavorites ? "Tap the ♡ on any game to add it here, or choose All Games above." : "Try another search or letter.";
+
+        empty.append(heading, message);
+        container.appendChild(empty);
+        updateImageCounts();
+        return;
+      }
+
+      filtered.forEach(game => {
+        const titleText = game.title || "Untitled Game";
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
+        card.addEventListener("click", event => { if (!event.target.closest("button")) openGame(game); });
+        card.addEventListener("keydown", event => { if ((event.key === "Enter" || event.key === " ") && !event.target.closest("button")) { event.preventDefault(); openGame(game); } });
+        card.setAttribute("aria-label", "Play " + titleText);
+
+        const cover = document.createElement("div");
+        cover.className = "cover";
+        cover.dataset.gameTitle = titleText;
+        cover.dataset.imageStatus = "loading";
+        cover.appendChild(createFallback(titleText));
+
+        const artworkTools = document.createElement("div");
+        artworkTools.className = "artwork-tools";
+
+        const uploadImageButton = document.createElement("button");
+        uploadImageButton.type = "button";
+        uploadImageButton.className = "artwork-tool-button upload-artwork";
+        uploadImageButton.textContent = "Upload / Paste Image";
+        uploadImageButton.setAttribute("aria-label", "Upload an image or paste an image URL for " + titleText);
+        uploadImageButton.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openArtworkPicker(game, cover, uploadImageButton);
+        });
+        artworkTools.append(uploadImageButton);
+        cover.appendChild(artworkTools);
+        const favoriteButton = document.createElement("button");
+        favoriteButton.type = "button"; favoriteButton.className = "favorite-toggle";
+        const gameKey = String(game.url || titleText);
+        const isFavorite = favoriteGameUrls.has(gameKey);
+        favoriteButton.classList.toggle("is-favorite", isFavorite);
+        favoriteButton.textContent = isFavorite ? "♥" : "♡";
+        favoriteButton.setAttribute("aria-label", (isFavorite ? "Remove from" : "Add to") + " favorites: " + titleText);
+        favoriteButton.addEventListener("click", event => {
+          event.preventDefault(); event.stopPropagation();
+          if (favoriteGameUrls.has(gameKey)) favoriteGameUrls.delete(gameKey); else favoriteGameUrls.add(gameKey);
+          saveFavorites(); renderGames();
+        });
+        cover.appendChild(favoriteButton);
+
+        const info = document.createElement("div");
+        info.className = "card-info";
+
+        const title = document.createElement("div");
+        title.className = "title";
+        title.textContent = titleText;
+
+        const play = document.createElement("div");
+        play.className = "play-label";
+        play.textContent = "▶  PLAY GAME";
+
+        info.append(title, play);
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "admin-delete-button";
+        deleteButton.textContent = "Delete";
+        deleteButton.setAttribute("aria-label", "Delete " + titleText);
+        deleteButton.addEventListener("click", event => {
+          event.preventDefault(); event.stopPropagation();
+          openDeleteGameDialog(game);
+        });
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className = "admin-edit-button";
+        editButton.textContent = "Change Game";
+        editButton.setAttribute("aria-label", "Change game name or URL for " + titleText);
+        editButton.addEventListener("click", event => {
+          event.preventDefault(); event.stopPropagation();
+          openEditGameDialog(game);
+        });
+        const adminActions = document.createElement("div");
+        adminActions.className = "admin-card-actions";
+        if (secretModeEnabled || document.body.classList.contains("secret-artwork-mode")) {
+          adminActions.style.setProperty("display", "flex", "important");
+          adminActions.style.setProperty("visibility", "visible", "important");
+          adminActions.style.setProperty("z-index", "30", "important");
+          [editButton, deleteButton].forEach(button => {
+            button.style.setProperty("display", "inline-flex", "important");
+            button.style.setProperty("visibility", "visible", "important");
+          });
+        }
+        adminActions.append(editButton, deleteButton);
+        card.append(cover, info, adminActions);
+        container.appendChild(card);
+
+        loadImage(cover, titleText, candidatesFor(game), 0);
+      });
+
+      updateImageCounts();
+    }
+
+    searchInput.addEventListener("input", renderGames);
+    
+
+    document.getElementById("alphabet").addEventListener("click", event => {
+      const button = event.target.closest("button[data-letter]");
+      if (!button) return;
+
+      selectedLetter = button.dataset.letter;
+
+      document.querySelectorAll(".letter-btn").forEach(item => {
+        item.classList.toggle("active", item === button);
+      });
+
+      renderGames();
+    });
+
+    google.script.run
+      .withSuccessHandler(games => {
+        allGames = Array.isArray(games) ? games : [];
+        allGames.forEach((game, index) => { if (game._originalOrder == null) game._originalOrder = index; });
+
+        // Apply the visitor's Default Opening Page now that games and favorites are loaded.
+        applyInitialView();
+        // Display only artwork already saved in the catalog or supplied manually.
+        // Do not run the automatic missing-artwork lookup.
+        renderGames();
+        collectRandomImages();
+      })
+      .withFailureHandler(error => {
+        countPill.textContent = "Error";
+        resultLabel.textContent = "Couldn't load your collection";
+        container.replaceChildren();
+
+        const empty = document.createElement("div");
+        empty.className = "empty";
+
+        const heading = document.createElement("strong");
+        heading.textContent = "Unable to load games";
+
+        const message = document.createElement("span");
+        message.textContent =
+          error && error.message ? error.message : "Unknown error";
+
+        empty.append(heading, message);
+        container.appendChild(empty);
+      })
+      .getGames();
+
+
+    // Personal appearance preferences are stored locally per browser/device.
+    (() => {
+      const storageKey = "inabox_personal_site_settings_v1";
+      const backdrop = document.getElementById("site-settings-backdrop");
+      const outlineInput = document.getElementById("settings-outline");
+      const backgroundSelect = document.getElementById("settings-background");
+      const cursorSelect = document.getElementById("settings-cursor");
+      const hoverSelect = document.getElementById("settings-hover-effect");
+      const hideHomeTitleSelect = document.getElementById("settings-hide-home-title");
+      const customFileInput = document.getElementById("settings-custom-background");
+      const customStatus = document.getElementById("settings-custom-status");
+      const customRemove = document.getElementById("settings-custom-remove");
+      const cursorCssId = "inabox-personal-cursor-style";
+      const backgrounds = {
+        default: { page:"radial-gradient(ellipse at 50% -35%, rgba(20,184,166,.12), transparent 55%), #090d13", panel:"rgba(8,13,25,.92)", hero:"radial-gradient(ellipse at 50% 50%, rgba(37,99,235,.3), transparent 58%), linear-gradient(110deg,#101c35,#102957,#10182a)" },
+        aurora: { page:"radial-gradient(ellipse 55% 34% at 12% 24%,rgba(20,255,210,.42),transparent 72%), radial-gradient(ellipse 48% 38% at 85% 62%,rgba(50,110,255,.42),transparent 72%), radial-gradient(ellipse 58% 30% at 52% 92%,rgba(190,55,255,.34),transparent 74%), linear-gradient(145deg,#020912,#071b2d 52%,#08091b)", panel:"rgba(4,17,29,.88)", hero:"linear-gradient(115deg,#07343c,#14566a,#202d59)" },
+        starfield: { page:"radial-gradient(2px 2px at 18% 22%,#ffffff 98%,transparent 100%), radial-gradient(2px 2px at 68% 52%,#b9dcff 98%,transparent 100%), radial-gradient(1.5px 1.5px at 82% 76%,#ffffff 98%,transparent 100%), linear-gradient(180deg,#02040c,#080d20 58%,#02040c)", panel:"rgba(5,8,24,.9)", hero:"linear-gradient(115deg,#111638,#27265a,#102c48)" },
+        neongrid: { page:"linear-gradient(rgba(32,220,255,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(32,220,255,.28) 1px,transparent 1px),radial-gradient(ellipse at 50% 0%,rgba(140,35,255,.36),transparent 58%) ,linear-gradient(180deg,#050511,#0c0924 55%,#030710)", panel:"rgba(8,8,28,.9)", hero:"linear-gradient(115deg,#19133f,#173b65,#10243f)" },
+        ocean: { page:"radial-gradient(ellipse at 18% 28%,rgba(0,220,210,.3),transparent 38%),radial-gradient(ellipse at 82% 72%,rgba(20,105,220,.36),transparent 42%),linear-gradient(150deg,#020d19,#052a3b 55%,#03101e)", panel:"rgba(3,20,31,.91)", hero:"linear-gradient(115deg,#06313c,#07536a,#102b50)" },
+        sunset: { page:"radial-gradient(ellipse at 50% 75%,rgba(255,70,160,.36),transparent 38%),linear-gradient(180deg,#100827,#35104d 48%,#a43855 78%,#160b24)", panel:"rgba(25,9,34,.91)", hero:"linear-gradient(115deg,#35104d,#8b285e,#3a174d)" },
+        forest: { page:"radial-gradient(ellipse at 20% 20%,rgba(70,180,110,.22),transparent 38%),radial-gradient(ellipse at 80% 75%,rgba(25,110,90,.28),transparent 42%),linear-gradient(145deg,#06130f,#10291d 55%,#07120f)", panel:"rgba(5,23,16,.92)", hero:"linear-gradient(115deg,#123b2a,#1e6040,#102d26)" },
+        galaxy: { page:"radial-gradient(ellipse at 25% 35%,rgba(145,70,255,.32),transparent 42%),radial-gradient(ellipse at 75% 65%,rgba(30,100,255,.3),transparent 45%),linear-gradient(145deg,#080416,#170d32 55%,#050816)", panel:"rgba(13,7,31,.92)", hero:"linear-gradient(115deg,#211047,#38216e,#142650)" },
+        embers: { page:"radial-gradient(4px 4px at 18% 82%,rgba(255,205,100,.98),transparent 72%),radial-gradient(3px 3px at 52% 72%,rgba(255,105,45,.96),transparent 72%),radial-gradient(4px 4px at 82% 90%,rgba(255,160,65,.96),transparent 72%),radial-gradient(ellipse at 50% 100%,rgba(205,65,20,.42),transparent 52%) ,linear-gradient(180deg,#09080d,#1d0d13 68%,#07070b)", panel:"rgba(20,10,16,.91)", hero:"linear-gradient(115deg,#3a1717,#71301e,#302044)" }
+      };
+      const cursorValues = {
+        default:"auto",
+        circle:'url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2732%27 height=%2732%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%278%27 fill=%27none%27 stroke=%27%2319b8b0%27 stroke-width=%273%27/%3E%3C/svg%3E") 16 16, auto',
+        dot:'url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2732%27 height=%2732%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%274%27 fill=%27%2319b8b0%27 stroke=%27white%27 stroke-width=%271%27/%3E%3C/svg%3E") 16 16, auto',
+        square:'url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2732%27 height=%2732%27 viewBox=%270 0 32 32%27%3E%3Crect x=%279%27 y=%279%27 width=%2714%27 height=%2714%27 rx=%272%27 fill=%27%2319b8b0%27 stroke=%27white%27 stroke-width=%272%27/%3E%3C/svg%3E") 16 16, auto',
+        diamond:'url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2732%27 height=%2732%27 viewBox=%270 0 32 32%27%3E%3Cpath d=%27M16 6 L26 16 L16 26 L6 16 Z%27 fill=%27%2319b8b0%27 stroke=%27white%27 stroke-width=%272%27/%3E%3C/svg%3E") 16 16, auto'
+      };
+      const svgCursor = (svg, x, y) => 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '") ' + x + ' ' + y + ', auto';
+      const svgOpen = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">';
+      let pixelRows = ""; for (let i = 0; i < 10; i++) pixelRows += '<rect x="4" y="' + (2 + i * 2) + '" width="' + (2 + i * 2) + '" height="2"/>';
+      pixelRows += '<rect x="8" y="22" width="4" height="8"/>';
+      Object.assign(cursorValues, {
+        crosshair: svgCursor(svgOpen + '<circle cx="16" cy="16" r="9" fill="none" stroke="#19b8b0" stroke-width="2"/><path d="M16 2v8M16 22v8M2 16h8M22 16h8" stroke="#fff" stroke-width="2"/><circle cx="16" cy="16" r="1.8" fill="#ff4d6d"/></svg>', 16, 16),
+        star: svgCursor(svgOpen + '<polygon points="16,3 19.8,12 29,12.6 21.9,18.5 24.2,27.5 16,22.6 7.8,27.5 10.1,18.5 3,12.6 12.2,12" fill="#ffd23f" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>', 16, 16),
+        bolt: svgCursor(svgOpen + '<polygon points="18,2 6,18 14,18 12,30 26,12 17,12" fill="#ffe14d" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>', 16, 16),
+        neon: svgCursor(svgOpen + '<defs><filter id="g" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6"/></filter></defs><path d="M6 4L6 26 12 20 16 29 20 27 16 18 24 18Z" fill="none" stroke="#19f0e0" stroke-width="3" filter="url(#g)"/><path d="M6 4L6 26 12 20 16 29 20 27 16 18 24 18Z" fill="#06201f" stroke="#7ffcf2" stroke-width="1.6" stroke-linejoin="round"/></svg>', 6, 4),
+        pixel: svgCursor(svgOpen + '<g fill="#111" transform="translate(2 2)" shape-rendering="crispEdges">' + pixelRows + '</g><g fill="#fff" shape-rendering="crispEdges">' + pixelRows + '</g></svg>', 4, 2),
+        ghost: svgCursor(svgOpen + '<path d="M7 28V14a9 9 0 0 1 18 0v14l-3-3-3 3-3-3-3 3-3-3z" fill="#fff" stroke="#6b7a90" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12.5" cy="14" r="2" fill="#111"/><circle cx="19.5" cy="14" r="2" fill="#111"/></svg>', 16, 16)
+      });
+      function safeSettings(raw) {
+        const x = raw && typeof raw === "object" ? raw : {};
+        return { hoverEffect:["lift","glow","tilt","shine","pop","pulse","float","zoom","flip","none"].includes(x.hoverEffect) ? x.hoverEffect : "lift", hideHomeTitle:x.hideHomeTitle === true, outline:/^#[0-9a-f]{6}$/i.test(x.outline || "") ? x.outline : "#19b8b0", background:(backgrounds[x.background] || x.background === "custom" || (typeof x.background === "string" && /^shared:[A-Za-z0-9_-]+$/.test(x.background))) ? x.background : "default", cursor:Object.hasOwn(cursorValues, x.cursor) ? x.cursor : "default" };
+      }
+      const customDbName = "inabox-personal-backgrounds-v1";
+      let customObjectUrl = "";
+      function openCustomDb() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(customDbName, 1);
+          request.onupgradeneeded = () => { if (!request.result.objectStoreNames.contains("files")) request.result.createObjectStore("files"); };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error || new Error("Could not open local background storage."));
+        });
+      }
+      async function storeCustomFile(file) {
+        const db = await openCustomDb();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction("files", "readwrite");
+          tx.objectStore("files").put({ blob:file, name:file.name, type:file.type || "" }, "custom-background");
+          tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+      }
+      async function getCustomFile() {
+        const db = await openCustomDb();
+        const value = await new Promise((resolve, reject) => {
+          const req = db.transaction("files", "readonly").objectStore("files").get("custom-background");
+          req.onsuccess = () => resolve(req.result || null); req.onerror = () => reject(req.error);
+        });
+        db.close(); return value;
+      }
+      async function deleteCustomFile() {
+        const db = await openCustomDb();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction("files", "readwrite"); tx.objectStore("files").delete("custom-background");
+          tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+        if (customObjectUrl) URL.revokeObjectURL(customObjectUrl);
+        customObjectUrl = "";
+      }
+      async function applyCustomBackground() {
+        const layer = document.getElementById("personal-background-layer");
+        if (!layer) return false;
+        let savedFile;
+        try { savedFile = await getCustomFile(); } catch (error) { console.warn("Custom background storage unavailable:", error); return false; }
+        if (!savedFile || !savedFile.blob) return false;
+        if (customObjectUrl) URL.revokeObjectURL(customObjectUrl);
+        customObjectUrl = URL.createObjectURL(savedFile.blob);
+        layer.replaceChildren(); layer.style.backgroundImage = "none";
+        const type = savedFile.type || savedFile.blob.type || "";
+        if (type.startsWith("video/") || /\.(webm|mp4)$/i.test(savedFile.name || "")) {
+          const video = document.createElement("video");
+          video.src = customObjectUrl; video.autoplay = true; video.loop = true; video.muted = true; video.playsInline = true;
+          video.setAttribute("aria-hidden", "true"); layer.appendChild(video);
+          const play = video.play(); if (play && play.catch) play.catch(() => {});
+        } else {
+          layer.style.backgroundImage = `url("${customObjectUrl}")`;
+          layer.style.backgroundSize = "cover"; layer.style.backgroundRepeat = "no-repeat"; layer.style.backgroundPosition = "center";
+        }
+        return true;
+      }
+      let sharedBackgrounds = [];
+      const sharedTools = document.getElementById("admin-shared-background-tools");
+      const sharedNameInput = document.getElementById("settings-shared-name");
+      const sharedFileInput = document.getElementById("settings-shared-file");
+      const sharedStatus = document.getElementById("settings-shared-status");
+      const sharedUploadButton = document.getElementById("settings-shared-upload");
+      function refreshSharedBackgrounds() {
+        if (!(window.google && google.script && google.script.run)) return Promise.resolve([]);
+        return new Promise(resolve => google.script.run.withSuccessHandler(items => {
+          sharedBackgrounds = Array.isArray(items) ? items : [];
+          const keep = backgroundSelect.value;
+          [...backgroundSelect.querySelectorAll('option[data-shared="1"]')].forEach(o => o.remove());
+          sharedBackgrounds.forEach(item => {
+            const option = document.createElement("option"); option.value = "shared:" + item.id; option.textContent = item.name; option.dataset.shared = "1"; backgroundSelect.appendChild(option);
+          });
+          if ([...backgroundSelect.options].some(o => o.value === keep)) backgroundSelect.value = keep;
+          if (saved.background && saved.background.startsWith("shared:")) { if (sharedBackgrounds.some(x => "shared:" + x.id === saved.background)) applySharedBackground(saved.background.slice(7)); else { saved.background = "default"; apply(saved); } }
+          resolve(sharedBackgrounds);
+        }).withFailureHandler(() => resolve([])).getSharedBackgrounds());
+      }
+      const SHARED_BG_DB = "inabox-shared-backgrounds-v1";
+      let activeSharedBgUrl = "";
+      function openSharedBgDb() {
+        return new Promise((resolve,reject) => {
+          const req = indexedDB.open(SHARED_BG_DB, 1);
+          req.onupgradeneeded = () => { if (!req.result.objectStoreNames.contains("videos")) req.result.createObjectStore("videos"); };
+          req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error);
+        });
+      }
+      async function getCachedSharedVideo(id) {
+        const db = await openSharedBgDb();
+        const value = await new Promise((resolve,reject) => { const req=db.transaction("videos","readonly").objectStore("videos").get(id); req.onsuccess=()=>resolve(req.result || null); req.onerror=()=>reject(req.error); });
+        db.close(); return value && value.blob ? value.blob : null;
+      }
+      async function cacheSharedVideo(id, blob) {
+        const db = await openSharedBgDb();
+        await new Promise((resolve,reject) => { const tx=db.transaction("videos","readwrite"); tx.objectStore("videos").put({blob,savedAt:Date.now()},id); tx.oncomplete=resolve; tx.onerror=()=>reject(tx.error); });
+        db.close();
+      }
+      async function loadSharedVideo(id, item) {
+        try { const cached=await getCachedSharedVideo(id); if (cached && cached.size) return cached; } catch (e) { console.warn("Shared background cache unavailable",e); }
+        const meta=await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getSharedBackgroundInfo(id));
+        if (!meta || !meta.size || meta.size > 25*1024*1024) throw new Error("Shared video is missing or exceeds 25 MB.");
+        const chunks=[]; const size=1000000;
+        for(let offset=0;offset<meta.size;offset+=size){
+          const part=await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getSharedBackgroundChunk(id,offset,size));
+          if(!part || !part.base64) throw new Error("A shared video segment could not be downloaded.");
+          const binary=atob(part.base64), bytes=new Uint8Array(binary.length); for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i); chunks.push(bytes);
+        }
+        const blob=new Blob(chunks,{type:meta.type || item.type || "video/mp4"});
+        try { await cacheSharedVideo(id,blob); } catch(e) { console.warn("Could not cache shared video",e); }
+        return blob;
+      }
+      function applySharedBackground(id) {
+        const item = sharedBackgrounds.find(x => x.id === id);
+        const layer = document.getElementById("personal-background-layer");
+        if (!item || !layer) return false;
+        layer.replaceChildren(); layer.style.backgroundImage = "none";
+        if (/^video\//i.test(item.type) || /\.(webm|mp4)$/i.test(item.name)) {
+          layer.dataset.sharedBackgroundId = id;
+          loadSharedVideo(id,item).then(blob => {
+            if (layer.dataset.sharedBackgroundId !== id) return;
+            if (activeSharedBgUrl) URL.revokeObjectURL(activeSharedBgUrl);
+            activeSharedBgUrl = URL.createObjectURL(blob);
+            const video=document.createElement("video"); video.src=activeSharedBgUrl; video.autoplay=true; video.loop=true; video.muted=true; video.playsInline=true; video.setAttribute("aria-hidden","true");
+            layer.replaceChildren(video); const play=video.play(); if(play && play.catch) play.catch(()=>{});
+          }).catch(error => { console.error("Shared background failed to load",error); if(sharedStatus) sharedStatus.textContent="Shared background couldn't load: "+(error.message || error); });
+        } else { layer.style.backgroundImage = `url("${item.url}")`; layer.style.backgroundSize = "cover"; layer.style.backgroundPosition = "center"; }
+        return true;
+      }
+      sharedUploadButton.addEventListener("click", async () => {
+        const file = sharedFileInput.files && sharedFileInput.files[0], name = sharedNameInput.value.trim();
+        if (!secretModeEnabled || !adminDeviceToken) { sharedStatus.textContent = "Admin mode is required."; return; }
+        if (!name) { sharedStatus.textContent = "Enter a name for this background."; return; }
+        if (!file || !/\.(webm|mp4|gif|webp)$/i.test(file.name)) { sharedStatus.textContent = "Choose a WebM, MP4, GIF, or WebP file."; return; }
+        if (file.size > 25 * 1024 * 1024) { sharedStatus.textContent = "File is too large. Maximum is 25 MB."; return; }
+        sharedUploadButton.disabled = true; sharedStatus.textContent = "Uploading background for everyone…";
+        try {
+          const dataUrl = await new Promise((resolve,reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });
+          await new Promise((resolve,reject) => google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).uploadSharedBackground(adminDeviceToken,name,dataUrl,file.name));
+          sharedStatus.textContent = "Added! Everyone can now select “" + name + "” in Background."; sharedNameInput.value = ""; sharedFileInput.value = ""; refreshSharedBackgrounds();
+        } catch (error) { sharedStatus.textContent = error && error.message ? error.message : "Upload failed."; }
+        finally { sharedUploadButton.disabled = false; }
+      });
+      function apply(settings) {
+        const v = safeSettings(settings), bg = backgrounds[v.background] || backgrounds.default;
+        document.documentElement.style.setProperty("--user-outline", v.outline);
+        document.body.classList.remove("card-hover-lift","card-hover-glow","card-hover-tilt","card-hover-shine","card-hover-pop","card-hover-pulse","card-hover-float","card-hover-zoom","card-hover-flip","card-hover-none");
+        document.body.classList.add("card-hover-" + v.hoverEffect);
+        document.documentElement.style.setProperty("--border", v.outline);
+        document.documentElement.style.setProperty("--user-page-bg", bg.page);
+        const backgroundLayer = document.getElementById("personal-background-layer");
+        // Only the Original dark theme uses an inline image. For animated themes,
+        // leave this empty so the selected theme's full CSS scene can render.
+        if (backgroundLayer) { backgroundLayer.style.backgroundImage = v.background === "default" ? bg.page : ""; if (v.background !== "custom" && !v.background.startsWith("shared:")) { backgroundLayer.replaceChildren(); backgroundLayer.style.backgroundSize = ""; backgroundLayer.style.backgroundRepeat = ""; backgroundLayer.style.backgroundPosition = ""; } }
+        document.documentElement.style.setProperty("--user-panel-bg", bg.panel);
+        document.documentElement.style.setProperty("--user-hero-bg", bg.hero);
+        document.body.classList.add("user-theme-active");
+        const playerShell = document.querySelector(".game-player-shell");
+        document.body.classList.toggle("hide-home-title", v.hideHomeTitle);
+        document.body.classList.remove("theme-aurora","theme-starfield","theme-neongrid","theme-embers","theme-ocean","theme-sunset","theme-forest","theme-galaxy");
+        if (v.background !== "default" && v.background !== "custom" && !v.background.startsWith("shared:")) document.body.classList.add("theme-" + v.background);
+        let style = document.getElementById(cursorCssId);
+        if (!style) { style = document.createElement("style"); style.id = cursorCssId; document.head.appendChild(style); }
+        if (v.cursor === "default") style.textContent = "";
+        else style.textContent = `html,body,body *{cursor:${cursorValues[v.cursor]} !important}`;
+      }
+      customFileInput.addEventListener("change", () => {
+        const file = customFileInput.files && customFileInput.files[0];
+        if (!file) return;
+        const allowed = /\.(webm|mp4|gif|webp)$/i.test(file.name);
+        if (!allowed) { customStatus.textContent = "Unsupported file. Choose WebM, MP4, GIF, or WebP."; customFileInput.value = ""; return; }
+        if (file.size > 25 * 1024 * 1024) { customStatus.textContent = "That file is over 25 MB. Choose a smaller background."; customFileInput.value = ""; return; }
+        storeCustomFile(file).then(() => {
+          backgroundSelect.value = "custom"; syncPickers();
+          customStatus.textContent = "Saved locally: " + file.name + ". Choose Save to apply it.";
+        }).catch(error => { console.error(error); customStatus.textContent = "Could not save that file in this browser."; });
+      });
+      customRemove.addEventListener("click", async () => {
+        try { await deleteCustomFile(); customFileInput.value = ""; customStatus.textContent = "Your uploaded background was removed from this browser."; if (backgroundSelect.value === "custom") { backgroundSelect.value = "default"; syncPickers(); } }
+        catch (error) { customStatus.textContent = "Could not remove the saved background."; }
+      });
+      function readForm() { return safeSettings({ outline:outlineInput.value, background:backgroundSelect.value, cursor:cursorSelect.value, hoverEffect:hoverSelect.value, hideHomeTitle:hideHomeTitleSelect.value === "hide" }); }
+      const openingPageSelect = document.getElementById("settings-opening-page");
+      function fillForm(v) { outlineInput.value=v.outline; backgroundSelect.value=v.background; cursorSelect.value=v.cursor; hoverSelect.value=v.hoverEffect; hideHomeTitleSelect.value=v.hideHomeTitle ? "hide" : "show"; openingPageSelect.value=getOpeningPagePref(); syncPickers(); }
+      function applyHoverEffect(effect) {
+        const safe = ["lift","glow","tilt","shine","pop","pulse","float","zoom","flip","none"].includes(effect) ? effect : "lift";
+        document.body.classList.remove("card-hover-lift","card-hover-glow","card-hover-tilt","card-hover-shine","card-hover-pop","card-hover-pulse","card-hover-float","card-hover-zoom","card-hover-flip","card-hover-none");
+        document.body.classList.add("card-hover-" + safe);
+      }
+      // Changing the hover effect updates every card instantly (cards are styled by a body class, so
+      // dynamically re-rendered cards are covered too) and is saved right away.
+      hoverSelect.addEventListener("change", () => {
+        saved.hoverEffect = safeSettings({ hoverEffect:hoverSelect.value }).hoverEffect;
+        applyHoverEffect(saved.hoverEffect);
+        try { localStorage.setItem(storageKey, JSON.stringify(saved)); } catch (_) {}
+      });
+      openingPageSelect.addEventListener("change", () => setOpeningPagePref(openingPageSelect.value));
+
+      // ---------- Background live preview (hover a theme tile) ----------
+      let bgSnap = null;
+      const themeClassNames = ["theme-aurora","theme-starfield","theme-neongrid","theme-embers","theme-ocean","theme-sunset","theme-forest","theme-galaxy"];
+      const previewBadge = document.createElement("div"); previewBadge.id = "bg-preview-badge"; backdrop.appendChild(previewBadge);
+      function startBgPreview(key, label) {
+        const bg = backgrounds[key]; const layer = document.getElementById("personal-background-layer");
+        if (!bg || !layer) return;
+        const root = document.documentElement.style;
+        if (!bgSnap) bgSnap = { themes:themeClassNames.filter(c => document.body.classList.contains(c)), css:layer.style.cssText, page:root.getPropertyValue("--user-page-bg"), panel:root.getPropertyValue("--user-panel-bg"), hero:root.getPropertyValue("--user-hero-bg") };
+        document.body.classList.remove(...themeClassNames);
+        if (key !== "default") document.body.classList.add("theme-" + key);
+        layer.style.cssText = ""; if (key === "default") layer.style.backgroundImage = bg.page;
+        layer.classList.add("bg-previewing");
+        root.setProperty("--user-page-bg", bg.page); root.setProperty("--user-panel-bg", bg.panel); root.setProperty("--user-hero-bg", bg.hero);
+        previewBadge.textContent = "Previewing: " + label;
+        backdrop.classList.add("previewing-bg");
+      }
+      function endBgPreview() {
+        backdrop.classList.remove("previewing-bg");
+        if (!bgSnap) return;
+        const layer = document.getElementById("personal-background-layer"), root = document.documentElement.style;
+        document.body.classList.remove(...themeClassNames); bgSnap.themes.forEach(c => document.body.classList.add(c));
+        if (layer) { layer.classList.remove("bg-previewing"); layer.style.cssText = bgSnap.css; }
+        root.setProperty("--user-page-bg", bgSnap.page); root.setProperty("--user-panel-bg", bgSnap.panel); root.setProperty("--user-hero-bg", bgSnap.hero);
+        bgSnap = null;
+      }
+
+      // ---------- Generic tile picker (keeps the original <select> as the source of truth) ----------
+      const pickers = [];
+      function syncPickers() { pickers.forEach(p => p.sync()); }
+      function buildPicker(select, opts) {
+        const wrap = document.createElement("div"); wrap.className = "pick-grid"; wrap.setAttribute("role", "radiogroup"); wrap.style.setProperty("--cols", opts.cols || 3);
+        const hint = document.createElement("span"); hint.className = "pick-hint"; hint.textContent = opts.hint || "";
+        select.classList.add("picker-hidden"); select.after(hint); hint.after(wrap);
+        function sync() { wrap.querySelectorAll(".pick-tile").forEach(t => { const on = t.dataset.value === select.value; t.classList.toggle("selected", on); t.setAttribute("aria-checked", on ? "true" : "false"); }); }
+        function rebuild() {
+          wrap.replaceChildren();
+          [...select.options].forEach(o => {
+            const b = document.createElement("button"); b.type = "button"; b.className = "pick-tile" + (opts.tileClass ? " " + opts.tileClass : ""); b.dataset.value = o.value; b.setAttribute("role", "radio");
+            opts.render(b, o);
+            b.addEventListener("click", () => { select.value = o.value; select.dispatchEvent(new Event("change", { bubbles:true })); sync(); });
+            if (opts.onEnter) { b.addEventListener("mouseenter", () => opts.onEnter(o.value, o.textContent)); b.addEventListener("focus", () => opts.onEnter(o.value, o.textContent)); }
+            if (opts.onLeave) { b.addEventListener("mouseleave", () => opts.onLeave(o.value)); b.addEventListener("blur", () => opts.onLeave(o.value)); }
+            wrap.appendChild(b);
+          });
+          sync();
+        }
+        rebuild(); new MutationObserver(rebuild).observe(select, { childList:true });
+        const api = { sync, rebuild }; pickers.push(api); return api;
+      }
+      const tileLabel = (b, o) => { const l = document.createElement("span"); l.className = "pick-label"; l.textContent = o.textContent; b.appendChild(l); };
+      buildPicker(hoverSelect, { cols:3, hint:"Hover over a card to see the effect. Click to choose it.", render:(b, o) => { b.dataset.effect = o.value; const c = document.createElement("span"); c.className = "hv-card"; b.appendChild(c); tileLabel(b, o); } });
+      buildPicker(backgroundSelect, { cols:3, hint:"Hover a theme to preview it on the page. Click, then Save.", render:(b, o) => {
+        const t = document.createElement("span"); t.className = "bg-thumb";
+        if (backgrounds[o.value]) { t.style.background = backgrounds[o.value].page; t.style.backgroundSize = "cover"; }
+        else { t.style.background = "linear-gradient(135deg,#243047,#111827)"; t.textContent = o.value === "custom" ? "🎞️" : "☁️"; }
+        b.appendChild(t); tileLabel(b, o);
+      }, onEnter:(v, label) => startBgPreview(v, label), onLeave:() => endBgPreview() });
+      buildPicker(cursorSelect, { cols:4, tileClass:"cursor-tile", hint:"Move your mouse over a choice to try that cursor. Click, then Save.", render:(b, o) => {
+        b.style.setProperty("--tile-cursor", cursorValues[o.value] || "auto");
+        const t = document.createElement("span"); t.className = "cur-thumb";
+        const m = (cursorValues[o.value] || "").match(/url\("([^"]+)"\)/);
+        if (m) t.style.backgroundImage = 'url("' + m[1] + '")'; else t.textContent = "↖";
+        b.appendChild(t); tileLabel(b, o);
+      } });
+      (function () {
+        const panel = backdrop.querySelector(".site-settings-panel");
+        panel.addEventListener("mousemove", e => {
+          const tile = e.target.closest && e.target.closest('.pick-tile[data-effect="tilt"]'); if (!tile) return;
+          const r = tile.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+          tile.style.setProperty("--ty", (px * 22).toFixed(1) + "deg"); tile.style.setProperty("--tx", (-py * 22).toFixed(1) + "deg");
+        });
+        panel.addEventListener("mouseout", e => { const tile = e.target.closest && e.target.closest('.pick-tile[data-effect="tilt"]'); if (tile && !tile.contains(e.relatedTarget)) { tile.style.removeProperty("--tx"); tile.style.removeProperty("--ty"); } });
+      })();
+      // 3D Tilt follows the pointer; one delegated listener covers cards created at any time.
+      (function setupTilt() {
+        const grid = document.getElementById("games");
+        if (!grid) return;
+        grid.addEventListener("mousemove", e => {
+          if (!document.body.classList.contains("card-hover-tilt")) return;
+          const card = e.target.closest && e.target.closest(".card");
+          if (!card) return;
+          const r = card.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+          card.style.setProperty("--tilt-y", (px * 18).toFixed(2) + "deg");
+          card.style.setProperty("--tilt-x", (-py * 18).toFixed(2) + "deg");
+        });
+        grid.addEventListener("mouseout", e => {
+          const card = e.target.closest && e.target.closest(".card");
+          if (card && !card.contains(e.relatedTarget)) { card.style.removeProperty("--tilt-x"); card.style.removeProperty("--tilt-y"); }
+        });
+      })();
+      let saved = safeSettings({});
+      try { saved = safeSettings(JSON.parse(localStorage.getItem(storageKey) || "{}")); } catch (_) {}
+      if (saved.outline.toLowerCase() === "#b77719") saved.outline = "#19b8b0";
+      apply(saved);
+      if (saved.background === "custom") applyCustomBackground().then(ok => { if (!ok) { saved.background = "default"; apply(saved); } });
+      refreshSharedBackgrounds();
+      
+      const settingsOpenButton = document.getElementById("site-settings-open");
+      settingsOpenButton.addEventListener("click", () => {
+        // Open immediately; background-list refresh must never block the dialog.
+        fillForm(saved);
+        sharedTools.style.display = document.body.classList.contains("secret-artwork-mode") ? "grid" : "none";
+        backdrop.classList.add("open");
+        refreshSharedBackgrounds().catch(error => {
+          console.warn("Could not refresh shared backgrounds:", error);
+          if (sharedStatus) sharedStatus.textContent = "Could not refresh shared backgrounds right now.";
+        });
+      });
+      document.getElementById("settings-close").addEventListener("click", () => { endBgPreview(); backdrop.classList.remove("open"); });
+      backdrop.addEventListener("click", e => { if (e.target === backdrop) { endBgPreview(); backdrop.classList.remove("open"); } });
+      document.getElementById("settings-save").addEventListener("click", async () => { endBgPreview(); saved=readForm(); apply(saved); if (saved.background === "custom") { const ok = await applyCustomBackground(); if (!ok) { customStatus.textContent = "Upload a background file first."; return; } } else if (saved.background.startsWith("shared:")) { if (!applySharedBackground(saved.background.slice(7))) { sharedStatus.textContent = "That shared background is no longer available."; return; } } try { localStorage.setItem(storageKey, JSON.stringify(saved)); } catch (_) {} backdrop.classList.remove("open"); });
+      document.getElementById("settings-reset").addEventListener("click", () => { endBgPreview(); saved=safeSettings({}); fillForm(saved); apply(saved); if (customObjectUrl) { URL.revokeObjectURL(customObjectUrl); customObjectUrl=""; } try { localStorage.removeItem(storageKey); localStorage.removeItem(openingPageKey); } catch (_) {} openingPageSelect.value="home"; backdrop.classList.remove("open"); });
+    })();
+  </script>
+</body>
+</html>
